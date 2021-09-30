@@ -32,12 +32,29 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "cmsis_os.h"
+#include "stdbool.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+#define PACKET_HEADER_START 0b1101<<4
+#define PACKET_SET_BIT(dest,bitmask) dest= dest | (bitmask)
+#define PACKET_CLEAR_BIT(dest,bitmask) dest &= ~(bitmask)
+#define PACKET_SIGNAL_BIT_0   0
+#define PACKET_SIGNAL_BIT_1   1<<1
+#define PACKET_SIGNAL_BIT_2   1<<2
+#define PACKET_SIGNAL_BIT_3   1<<3
+#pragma pack(push,1)
+#pragma pack(1)
+typedef struct {
+	uint8_t header;
+	int16_t current;
+	int16_t voltage;
+	char eol;
+} serial_binary_packet_t;
+#pragma pack(pop)
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -83,8 +100,39 @@ void Error_Handler(void);
 #define KEY2_GPIO_Port GPIOB
 #define KEY3_Pin GPIO_PIN_9
 #define KEY3_GPIO_Port GPIOB
+#define SCREEN_TASK_STACK 301
+#define RX_TASK_STACK 75
 /* USER CODE BEGIN Private defines */
-
+extern osThreadId osUpdateScreenThreadId;
+extern uint64_t lsumBusMillVolts;
+extern uint64_t lsumBusMillVoltsOrig;
+extern int32_t  lmaxBusMillVolts;
+extern int32_t  lminBusMillVolts;
+extern int64_t  lsumBusMicroAmps;
+extern int32_t  lmaxBusMicroAmps;
+extern int32_t  lminBusMicroAmps;
+extern int64_t  lsumBusMicroAmpsOrig;
+extern int64_t  ltotalBusMicroAmps;
+extern uint32_t lreadings;
+extern int32_t  lnow;
+extern int16_t zero;
+extern int64_t totalBusMicroAmps;
+extern uint8_t forcedRange;
+extern uint8_t rangeScale;
+extern uint8_t overload;
+extern bool serialEnable;
+extern bool serialBinaryEnable;
+extern uint16_t ranges[4];
+extern uint16_t voltageK;
+extern uint16_t refreshT;
+extern uint8_t power;
+extern uint8_t ina226;
+extern osThreadId osHandlehandleUSBDataRXId;
+extern bool digitalInputEnable;
+extern bool requestedDigitalInputEnable;
+#define SIGNAL_DATA_RECEIVED (int32_t) 0x01<<0
+#define SIGNAL_CR_RECEIVED (int32_t) 0x01<<1
+extern bool serial1Initialized;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

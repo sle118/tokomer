@@ -49,6 +49,14 @@
   * @{
   */
 /* USER CODE BEGIN EXPORTED_DEFINES */
+#define  FIFO_SIZE 64   // must be 2^N
+#define FIFO_INCR(q,x) (((q.x)+1)&((sizeof(q.data)/sizeof(typeof(q.data[0])))-1))
+#define FIFO_INCR_HEAD(x) x.head= FIFO_INCR(x,head)
+#define FIFO_INCR_TAIL(x) x.tail= FIFO_INCR(x,tail)
+#define FIFO_OVERRUN(queue) (queue.head == queue.tail)
+#define FIFO_DATA_END(queue) FIFO_OVERRUN(queue)
+#define FIFO_PUSH(queue,val)  queue.data[queue.head]=val; FIFO_INCR_HEAD(queue)
+#define FIFO_POP_VALUE(target,queue) target= queue.data[queue.tail]; FIFO_INCR_TAIL(queue)
 
 /* USER CODE END EXPORTED_DEFINES */
 
@@ -62,6 +70,18 @@
   */
 
 /* USER CODE BEGIN EXPORTED_TYPES */
+
+
+
+
+/* Structure of FIFO*/
+typedef struct FIFO
+{
+	uint32_t head;
+	uint32_t tail;
+	uint8_t data[FIFO_SIZE];
+} FIFO;
+
 
 /* USER CODE END EXPORTED_TYPES */
 
@@ -91,7 +111,7 @@
 extern USBD_CDC_ItfTypeDef USBD_Interface_fops_FS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
-
+extern FIFO RX_FIFO;
 /* USER CODE END EXPORTED_VARIABLES */
 
 /**
