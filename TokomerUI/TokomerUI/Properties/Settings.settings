@@ -1,0 +1,66 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CerealPotter.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="regex_pattern" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(\w+),(\d+(\.\d+)?)</Value>
+    </Setting>
+    <Setting Name="serial_port" Type="System.String" Scope="User">
+      <Value Profile="(Default)">COM5</Value>
+    </Setting>
+    <Setting Name="regex_pattern_noname" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(\d+([\.]\d+)?)[,](\d+([\.]\d+)?)</Value>
+    </Setting>
+    <Setting Name="curve_names" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mA,V</Value>
+    </Setting>
+    <Setting Name="curve_multipliers" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0.001,0.01</Value>
+    </Setting>
+    <Setting Name="WindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">245, 258</Value>
+    </Setting>
+    <Setting Name="WindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">1463, 803</Value>
+    </Setting>
+    <Setting Name="ReadsPerSec" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">5000</Value>
+    </Setting>
+    <Setting Name="BufferLenSeconds" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="Threshold_mA" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">1.5</Value>
+    </Setting>
+    <Setting Name="PreThreshold_ms" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="TrigThresholdPct" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="TriggerAvgWindowMs" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="TriggerDelta_mA" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="PeakDetectionLag_ms" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="PeakDetectionSignalInfluence" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0.5</Value>
+    </Setting>
+    <Setting Name="PeakDetectionThreshold" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">3.5</Value>
+    </Setting>
+    <Setting Name="curves_titles" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Current,Voltage</Value>
+    </Setting>
+    <Setting Name="DataFileInitialDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Precision" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>

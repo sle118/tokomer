@@ -6,3 +6,11 @@
 Release
 Debug
 core
+
+TokomerUI/.vs/
+
+TokomerUI/packages/
+
+TokomerUI/TokomerUI/bin/
+
+TokomerUI/TokomerUI/obj/
