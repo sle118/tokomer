@@ -349,24 +349,39 @@ public static class ExtensionMethods
         value = (O)from.GetType().GetField(member.Name).GetValue(from);
         return value!=null;
     }
+    public static List<string> controlList=new List<string>();
     public static Control FindTag(this Control.ControlCollection controls, string tag)
     {
-        foreach (Control c in controls)
+        try
         {
-            if (c.Tag != null)
+            foreach (Control c in controls)
             {
-                var values = c.Tag.ToString().Split(',');
-                foreach (string ctrlTag in values)
+                controlList.Add(c.Name);
+                if (c.Tag != null)
                 {
-                    if (ctrlTag.StartsWith(tag))
+                    var values = c.Tag.ToString().Split(',');
+                    foreach (string ctrlTag in values)
                     {
-                        return c;
+                        if (ctrlTag.StartsWith(tag))
+                        {
+                            return c;
+                        }
                     }
+                    
+                }
+                if (c.HasChildren || (c.Controls != null && c.Controls.Count > 0))
+                {
+                    var res= c.Controls.FindTag(tag); //Recursively check all children controls as well; ie groupboxes or tabpages
+                    if (res != null) return res;
                 }
             }
-            if (c.HasChildren)
-                return FindTag(c.Controls, tag); //Recursively check all children controls as well; ie groupboxes or tabpages
         }
+        catch (Exception e)
+        {
+
+            Console.WriteLine(e);
+        }
+
         return null;
     }
     

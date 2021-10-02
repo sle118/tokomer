@@ -528,6 +528,7 @@ private void UpdateTextBox(TextBox txtBox, string msg)
                             
                             SystemStatus status = JsonConvert.DeserializeObject<SystemStatus>(dataRead);
                             StatusUpdateFromDevice = true;
+                            ExtensionMethods.controlList.Clear();
                             foreach (MemberInfo tag in status.GetType().GetMembers().Where(m => m.MemberType == System.Reflection.MemberTypes.Field))
                             {
                                 
