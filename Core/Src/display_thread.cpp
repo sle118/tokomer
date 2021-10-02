@@ -15,7 +15,6 @@ int32_t plot[128], plot1[128], plot2[128], plot3[128], plot4[128], plot5[128],
 		pmax, pmin;
 uint32_t scale;
 uint8_t pidx = 0, didx = 128;
-uint8_t gmode = 0;
 
 enum button {
 	NOKEY, KEY1, KEY2, KEY3
@@ -62,7 +61,7 @@ void handleButtons() {
 			enqueue(ACTION_RESET_STATS);
 		} else if (buttonCode == KEY1) {
 			// short KEY3 - toggle voltage o current graph
-			if (gmode) {
+			if (global.gmode) {
 				enqueue(ACTION_GRAPH_SELECT_CURRENT);
 			} else {
 				enqueue(ACTION_GRAPH_SELECT_VOLTAGE);
@@ -73,13 +72,13 @@ void handleButtons() {
 		if (buttonCode == KEY2) {
 			if (buttonTime > 500) {
 				// long KEY2, toogle sending data
-				if (serialEnable) {
+				if (global.serialEnable) {
 					enqueue(ACTION_SERIAL_OFF);
 				} else {
 					enqueue(ACTION_SERIAL_ON);
 				}
 			} else {
-				switch (rangeScale) {
+				switch (global.rangeScale) {
 				case 0:
 					enqueue(ACTION_SET_RANGE_SCALE_1);
 					break;
@@ -97,7 +96,7 @@ void handleButtons() {
 		}
 		if (buttonCode == KEY3) {
 			// short KEY, toogle power
-			if (power == 1)
+			if (global.power == 1)
 				enqueue(ACTION_POWER_OFF);
 			else
 				enqueue(ACTION_POWER_ON);
@@ -132,7 +131,7 @@ void updateScreenX(void const *arg) {
 		oled.setCursor(0, 0);
 		printFloat(v, 3, false, "v");
 
-		if (serialEnable) {
+		if (global.serialEnable) {
 			oled.setCursor(6, 0);
 			oled.putc(pidx % 2 ? '^' : ' ');
 		}
@@ -150,7 +149,7 @@ void updateScreenX(void const *arg) {
 		oled.puts(sbuf + 1);
 
 		// graph
-		if (overload == 0) {
+		if (global.overload == 0) {
 			plot[pidx] = lmaxBusMicroAmps;
 			plot1[pidx] = lminBusMicroAmps;
 			plot2[pidx] = lsumBusMicroAmps / lreadings;
@@ -160,7 +159,7 @@ void updateScreenX(void const *arg) {
 		}
 
 		int32_t *lpmin, *lpmax, *lpavg;
-		if (gmode == 0) {
+		if (global.gmode == 0) {
 			lpmin = plot1;
 			lpmax = plot;
 			lpavg = plot2;
@@ -183,7 +182,7 @@ void updateScreenX(void const *arg) {
 		}
 		if (pmax == pmin)
 			pmax += 1; // protect from device by zero
-		if (power == 1 || overload == 1) {
+		if (global.power == 1 || global.overload == 1) {
 			scale = ((1 << 25) * 36) / (pmax - pmin);
 			uint8_t idx_start =
 					didx > 0 ? ((pidx - (127 - didx)) % 128) : (pidx + 1) % 128;
@@ -191,7 +190,7 @@ void updateScreenX(void const *arg) {
 				uint8_t idx = (i + idx_start) % 128;
 				uint8_t min = ((scale * (lpmin[idx] - pmin)) >> 25);
 				uint8_t max = ((scale * (lpmax[idx] - pmin)) >> 25);
-				if (lpmax[idx] - lpmin[idx] <= (gmode == 0 ? 8 : 60)) {
+				if (lpmax[idx] - lpmin[idx] <= (global.gmode == 0 ? 8 : 60)) {
 					oled.set_pixel(oidx,
 							52 - ((scale * (lpavg[idx] - pmin)) >> 25));
 				} else {
@@ -203,8 +202,8 @@ void updateScreenX(void const *arg) {
 				}
 			}
 
-			// stop rolling on overload
-			if (overload == 0) {
+			// stop rolling on global.overload
+			if (global.overload == 0) {
 				pidx = pidx < 127 ? pidx + 1 : 0;
 				if (didx > 0)
 					didx--;
@@ -217,12 +216,12 @@ void updateScreenX(void const *arg) {
 
 			// max value on grath
 			oled.setCursor(0, 7);
-			printFloat((float) pmin / 1000, gmode == 0 ? 4 : 3, true,
-					gmode == 0 ? "mA" : "v");
+			printFloat((float) pmin / 1000, global.gmode == 0 ? 4 : 3, true,
+					global.gmode == 0 ? "mA" : "v");
 
 			oled.setCursor(9, 7);
-			printFloat((float) pmax / 1000, gmode == 0 ? 4 : 3, false,
-					gmode == 0 ? "mA" : "v");
+			printFloat((float) pmax / 1000, global.gmode == 0 ? 4 : 3, false,
+					global.gmode == 0 ? "mA" : "v");
 
 			// mAh
 			oled.setCursor(8, 1);
@@ -230,14 +229,14 @@ void updateScreenX(void const *arg) {
 					"mAh");
 		}
 
-		if (overload) {
+		if (global.overload) {
 			oled.setCursor(3, 3);
 			oled.puts("overload !!");
 		}
 
 		for (uint8_t i = 0; i <= 8; i += 2) {
 			for (uint8_t j = 0; j < 8 - i; j++) {
-				if (i >= rangeScale * 2)
+				if (i >= global.rangeScale * 2)
 					oled.set_pixel(56 + j, i);
 				else
 					oled.clear_pixel(56 + j, i);

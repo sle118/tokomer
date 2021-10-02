@@ -125,7 +125,7 @@ standard names. */
 
 /* USER CODE BEGIN Defines */   	      
 
-#define configCHECK_FOR_STACK_OVERFLOW 1
+#define configCHECK_FOR_STACK_OVERFLOW 0
 
 /* USER CODE END Defines */ 
 

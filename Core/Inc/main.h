@@ -55,6 +55,16 @@ typedef struct {
 	char eol;
 } serial_binary_packet_t;
 #pragma pack(pop)
+typedef struct {
+	bool gmode;
+	bool serialEnable;
+	bool serialBinaryEnable;
+	bool overload;
+	uint8_t rangeScale;
+	bool digitalInputEnable;
+	bool power;
+} system_state_t;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -100,8 +110,10 @@ void Error_Handler(void);
 #define KEY2_GPIO_Port GPIOB
 #define KEY3_Pin GPIO_PIN_9
 #define KEY3_GPIO_Port GPIOB
-#define SCREEN_TASK_STACK 301
+
+#define SCREEN_TASK_STACK 200
 #define RX_TASK_STACK 75
+
 /* USER CODE BEGIN Private defines */
 extern osThreadId osUpdateScreenThreadId;
 extern uint64_t lsumBusMillVolts;
@@ -118,21 +130,23 @@ extern int32_t  lnow;
 extern int16_t zero;
 extern int64_t totalBusMicroAmps;
 extern uint8_t forcedRange;
-extern uint8_t rangeScale;
-extern uint8_t overload;
-extern bool serialEnable;
-extern bool serialBinaryEnable;
+//extern uint8_t rangeScale;
+//extern uint8_t overload;
+//extern bool serialEnable;
+//extern bool serialBinaryEnable;
 extern uint16_t ranges[4];
 extern uint16_t voltageK;
 extern uint16_t refreshT;
-extern uint8_t power;
+//extern uint8_t power;
 extern uint8_t ina226;
 extern osThreadId osHandlehandleUSBDataRXId;
-extern bool digitalInputEnable;
+//extern bool digitalInputEnable;
 extern bool requestedDigitalInputEnable;
 #define SIGNAL_DATA_RECEIVED (int32_t) 0x01<<0
 #define SIGNAL_CR_RECEIVED (int32_t) 0x01<<1
+#define SIGNAL_STATE_CHANGE (int32_t) 0x01<<2
 extern bool serial1Initialized;
+extern system_state_t global;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

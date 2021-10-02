@@ -78,11 +78,6 @@ void StartDefaultTask(void const *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void vApplicationStackOverflowHook( TaskHandle_t xTask,
-                                    signed char *pcTaskName )
-{
-	serialEnable=false;
-}
 /* USER CODE END 0 */
 
 /**
@@ -98,7 +93,6 @@ int main(void) {
 
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
-	configASSERT(configCHECK_FOR_STACK_OVERFLOW);
 	/* USER CODE BEGIN Init */
 
 	/* USER CODE END Init */
@@ -427,7 +421,7 @@ static void MX_GPIO_Digital_Configure(bool enable){
 			MX_USART1_UART_Init();
 		}
 	}
-	digitalInputEnable=enable;
+	global.digitalInputEnable=enable;
 }
 
 /**
@@ -525,6 +519,17 @@ void USR_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	osSignalSet(osMainThreadId, 0x1);
 }
 
+
+//typedef struct {
+//	bool gmode;
+//	bool serialEnable;
+//	bool serialBinaryEnable;
+//	bool global.overload;
+//	uint8_t rangeScale;
+//	bool digitalInputEnable;
+//}
+system_state_t global = {0};;
+
 int32_t miliVolts = 0;
 int32_t microAmps = 0;
 serial_binary_packet_t binary_packet={ .header=PACKET_HEADER_START,.current=0,.voltage=0,.eol='\n' };
@@ -540,21 +545,20 @@ int64_t totalBusMicroAmps = 0;
 uint32_t readings = 0;
 int16_t zero = 11;
 uint8_t skip = 0;
-uint8_t power = 0;
-uint8_t overload = 0;
+
+
 uint8_t power_state = 0;
 uint8_t ina226 = 0;
 uint8_t ina226_state = 0;
 uint8_t range = 3;
 uint8_t range_last = 3;
 uint8_t forcedRange = 0; // 0 - not forced, 1 - 5 Ohm, 2 - 0.5 Ohm, 3 - 0.05 Ohm
-bool serialEnable = false;
-bool serialBinaryEnable = false;
+//bool serialEnable = false;
+//bool serialBinaryEnable = false;
 bool serial1Initialized=false;
-bool digitalInputEnable=false;
 bool requestedDigitalInputEnable=false;
 uint16_t ranges[4] = { 0, 128, 1222, 10683 };
-uint8_t rangeScale = 0;
+
 uint32_t rangeScales[4][4] = { { 11000, 12000, 110000, 120000 }, { 5500, 6000,
 		55000, 60000 }, { 2750, 3000, 27500, 30000 },
 		{ 1100, 1200, 11000, 12000 }, };
@@ -591,7 +595,7 @@ int32_t lnow;
 #include "display_thread.h"
 
 osThreadDef(updateScreen, updateScreenX, osPriorityIdle, 1, SCREEN_TASK_STACK);
-osThreadDef(USBDataRX, handleUSBDataRX, osPriorityIdle, 1, RX_TASK_STACK);
+osThreadDef(USBRx, USBRx, osPriorityIdle, 1, RX_TASK_STACK);
 
 // using 2 buffers to pack data to best suite for 64 byte CDC blocks
 #define USB_SERIAL_TX_BUF_SIZE 64
@@ -645,40 +649,7 @@ void configureINA226Mode(uint8_t mode) {
 	HAL_I2C_Master_Transmit_IT(&hi2c1, 0x80, buf, 1);
 	osSignalWait(0x2, 10);
 }
-void handleDigitalPins() {
-	if(!(serialEnable || serialBinaryEnable))
-	{
-		// don't bother checking the levels, there's
-		// no use on the UI alone right now
-		// when serial is disabled
-		return;
-	}
-	if( !digitalInputEnable)
-	{
-		// reset the signals and bail out
-		PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_0);
-		PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
-		return;
-	}
-	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET)
-	{
-		PACKET_SET_BIT(binary_packet.header,PACKET_SIGNAL_BIT_0);
-	}
-	else
-	{
-		PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_0);
-	}
-	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == GPIO_PIN_SET)
-	{
-		PACKET_SET_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
-	}
-	else
-	{
-		PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
-	}
 
-	return;
-}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -696,7 +667,7 @@ void StartDefaultTask(void const *argument) {
 	initialize_commands();
 	osThreadCreate(osThread(updateScreen), NULL);
 	osThreadCreate(osThread(flushUsbThread), NULL);
-	osThreadCreate(osThread(USBDataRX), NULL);
+	osThreadCreate(osThread(USBRx), NULL);
 	HAL_TIM_Base_Start_IT(&htim3);
 
 	HAL_FLASH_Unlock();
@@ -757,10 +728,10 @@ void StartDefaultTask(void const *argument) {
 	for (;;) {
 		osSignalWait(0x1, 10);
 		HAL_ADC_Start(&hadc1);
-		if(digitalInputEnable!=requestedDigitalInputEnable)
-		{
-			MX_GPIO_Digital_Configure(requestedDigitalInputEnable);
-		}
+//		if(digitalInputEnable!=requestedDigitalInputEnable)
+//		{
+//			MX_GPIO_Digital_Configure(requestedDigitalInputEnable);
+//		}
 		if (ina226 != ina226_state) {
 			ina226_state = ina226;
 			configureINA226Mode(ina226_state);
@@ -783,8 +754,8 @@ void StartDefaultTask(void const *argument) {
 		if (skip == 0) {
 			// virtual current breaker, on max range max values, STOP!
 			if (range == 3 && (inaRes >= 0x7fff || inaRes <= -0x7fff)) {
-				power = 0;
-				overload = true;
+				global.power = 0;
+				global.overload = true;
 			}
 			// we might need to skeep measurement which happened when we switch ranges
 			microAmps = inaRes;
@@ -794,25 +765,25 @@ void StartDefaultTask(void const *argument) {
 			skip--;
 
 		// adjust range
-		if (power != power_state) {
+		if (global.power != power_state) {
 			HAL_GPIO_WritePin(EN_VOUT_GPIO_Port, EN_VOUT_Pin,
-					power ? GPIO_PIN_SET : GPIO_PIN_RESET);
-			power_state = power;
+					global.power ? GPIO_PIN_SET : GPIO_PIN_RESET);
+			power_state = global.power;
 		}
 		absMicroAmps = abs(microAmps);
 
 		// to put into right range when forced fake range control current
 		if (forcedRange != 0) {
 			if (forcedRange == 1)
-				absMicroAmps = rangeScales[rangeScale][0] - 1;
+				absMicroAmps = rangeScales[global.rangeScale][0] - 1;
 			else if (forcedRange == 2)
-				absMicroAmps = rangeScales[rangeScale][1] + 1;
+				absMicroAmps = rangeScales[global.rangeScale][1] + 1;
 			else
-				absMicroAmps = rangeScales[rangeScale][3] + 1;
+				absMicroAmps = rangeScales[global.rangeScale][3] + 1;
 		}
 
 		// range 1 locks if current < 11 ma
-		if (range != 1 && absMicroAmps < rangeScales[rangeScale][0]) {
+		if (range != 1 && absMicroAmps < rangeScales[global.rangeScale][0]) {
 			HAL_GPIO_WritePin(RANGE1_GPIO_Port, RANGE1_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(RANGE2_GPIO_Port, RANGE2_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(RANGE3_GPIO_Port, RANGE3_Pin, GPIO_PIN_RESET);
@@ -821,8 +792,8 @@ void StartDefaultTask(void const *argument) {
 		}
 
 		// range 2 lock if current grows above 12 ma or reduces less than 110
-		if (range != 2 && absMicroAmps > rangeScales[rangeScale][1]
-				&& absMicroAmps < rangeScales[rangeScale][2]) {
+		if (range != 2 && absMicroAmps > rangeScales[global.rangeScale][1]
+				&& absMicroAmps < rangeScales[global.rangeScale][2]) {
 			HAL_GPIO_WritePin(RANGE2_GPIO_Port, RANGE2_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(RANGE1_GPIO_Port, RANGE1_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(RANGE3_GPIO_Port, RANGE3_Pin, GPIO_PIN_RESET);
@@ -831,7 +802,7 @@ void StartDefaultTask(void const *argument) {
 		}
 
 		// range 3 locks for current bigger than 120 ma
-		if (range != 3 && absMicroAmps > rangeScales[rangeScale][3]) {
+		if (range != 3 && absMicroAmps > rangeScales[global.rangeScale][3]) {
 			HAL_GPIO_WritePin(RANGE3_GPIO_Port, RANGE3_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(RANGE2_GPIO_Port, RANGE2_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(RANGE1_GPIO_Port, RANGE1_Pin, GPIO_PIN_RESET);
@@ -865,8 +836,34 @@ void StartDefaultTask(void const *argument) {
 				maxBusMillVolts = miliVolts;
 		}
 		readings++;
-		handleDigitalPins();
-		if (serialEnable) {
+
+		if( !global.digitalInputEnable)
+		{
+				// reset the signals and bail out
+				PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_0);
+				PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
+		}
+		else
+		{
+			if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET)
+			{
+				PACKET_SET_BIT(binary_packet.header,PACKET_SIGNAL_BIT_0);
+			}
+			else
+			{
+				PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_0);
+			}
+			if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == GPIO_PIN_SET)
+			{
+				PACKET_SET_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
+			}
+			else
+			{
+				PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
+			}
+		}
+
+		if (global.serialEnable) {
 			itoa(microAmps, pageBuf, 10);
 			uint8_t len = strlen(pageBuf);
 			pageBuf += len;
@@ -890,7 +887,7 @@ void StartDefaultTask(void const *argument) {
 				pageBuf = bufUsb[usbPage];
 			}
 		}
-		else if(serialBinaryEnable)
+		else if(global.serialBinaryEnable)
 		{
 			binary_packet.current=(int16_t)microAmps;
 			binary_packet.voltage=(int16_t)miliVolts / 10;
@@ -922,7 +919,7 @@ void StartDefaultTask(void const *argument) {
 			lsumBusMicroAmpsOrig = sumBusMicroAmpsOrig;
 			ltotalBusMicroAmps = totalBusMicroAmps;
 			lreadings = readings;
-			if (overload == 0)
+			if (global.overload == 0)
 				lnow += 100;
 
 			// reset readings
