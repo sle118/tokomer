@@ -40,13 +40,17 @@
             this.comboBoxAvailableSerial = new System.Windows.Forms.ComboBox();
             this.buttonConnect = new System.Windows.Forms.Button();
             this.buttonStartPlot = new System.Windows.Forms.Button();
+            this.textBoxReceive = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.checkBoxPower = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.textBoxReceive = new System.Windows.Forms.TextBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label7 = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -94,6 +98,9 @@
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -200,14 +207,8 @@
             this.flowLayoutPanel2.Controls.Add(this.comboBoxAvailableSerial);
             this.flowLayoutPanel2.Controls.Add(this.buttonConnect);
             this.flowLayoutPanel2.Controls.Add(this.buttonStartPlot);
-            this.flowLayoutPanel2.Controls.Add(this.checkBoxPower);
-            this.flowLayoutPanel2.Controls.Add(this.checkBox1);
-            this.flowLayoutPanel2.Controls.Add(this.checkBox3);
-            this.flowLayoutPanel2.Controls.Add(this.label6);
-            this.flowLayoutPanel2.Controls.Add(this.comboBox1);
-            this.flowLayoutPanel2.Controls.Add(this.checkBox2);
             this.flowLayoutPanel2.Controls.Add(this.textBoxReceive);
-            this.flowLayoutPanel2.Controls.Add(this.comboBox2);
+            this.flowLayoutPanel2.Controls.Add(this.tableLayoutPanel1);
             this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(365, 650);
@@ -261,12 +262,49 @@
             this.buttonStartPlot.UseVisualStyleBackColor = true;
             this.buttonStartPlot.Click += new System.EventHandler(this.buttonStartPlot_Click_1);
             // 
+            // textBoxReceive
+            // 
+            this.textBoxReceive.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxReceive.Location = new System.Drawing.Point(4, 83);
+            this.textBoxReceive.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textBoxReceive.Multiline = true;
+            this.textBoxReceive.Name = "textBoxReceive";
+            this.textBoxReceive.Size = new System.Drawing.Size(209, 42);
+            this.textBoxReceive.TabIndex = 8;
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.AutoSize = true;
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.checkBoxPower, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.checkBox1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.checkBox3, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.checkBox2, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.panel2, 0, 5);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 133);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 6;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(296, 246);
+            this.tableLayoutPanel1.TabIndex = 17;
+            // 
             // checkBoxPower
             // 
             this.checkBoxPower.AutoSize = true;
-            this.checkBoxPower.Location = new System.Drawing.Point(183, 41);
+            this.checkBoxPower.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxPower.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.checkBoxPower.Location = new System.Drawing.Point(3, 3);
             this.checkBoxPower.Name = "checkBoxPower";
-            this.checkBoxPower.Size = new System.Drawing.Size(133, 24);
+            this.checkBoxPower.Size = new System.Drawing.Size(290, 34);
             this.checkBoxPower.TabIndex = 10;
             this.checkBoxPower.Tag = "poweroff,poweron";
             this.checkBoxPower.Text = "Power Enable";
@@ -276,9 +314,11 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(3, 81);
+            this.checkBox1.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.checkBox1.Location = new System.Drawing.Point(3, 43);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(177, 24);
+            this.checkBox1.Size = new System.Drawing.Size(290, 34);
             this.checkBox1.TabIndex = 11;
             this.checkBox1.Tag = "serialoff,serialon";
             this.checkBox1.Text = "Serial Data Transfer";
@@ -288,23 +328,40 @@
             // checkBox3
             // 
             this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(3, 111);
+            this.checkBox3.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.checkBox3.Location = new System.Drawing.Point(3, 83);
             this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(181, 24);
+            this.checkBox3.Size = new System.Drawing.Size(290, 34);
             this.checkBox3.TabIndex = 16;
             this.checkBox3.Tag = "binaryoff,binaryon";
             this.checkBox3.Text = "Binary Data Transfer";
             this.checkBox3.UseVisualStyleBackColor = true;
             this.checkBox3.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
             // 
-            // label6
+            // checkBox2
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(190, 108);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(79, 20);
-            this.label6.TabIndex = 14;
-            this.label6.Text = "Sensitivity";
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.checkBox2.Location = new System.Drawing.Point(3, 123);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(290, 34);
+            this.checkBox2.TabIndex = 13;
+            this.checkBox2.Tag = "digitaloff,digitalon";
+            this.checkBox2.Text = "Digital Input Enable";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.comboBox1);
+            this.panel1.Controls.Add(this.label6);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 163);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(290, 34);
+            this.panel1.TabIndex = 18;
             // 
             // comboBox1
             // 
@@ -314,7 +371,7 @@
             "Medium Precision",
             "Low Precision",
             "Lowest Precision"});
-            this.comboBox1.Location = new System.Drawing.Point(3, 141);
+            this.comboBox1.Location = new System.Drawing.Point(166, 3);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 28);
             this.comboBox1.TabIndex = 12;
@@ -322,28 +379,33 @@
             this.comboBox1.SelectionChangeCommitted += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
             this.comboBox1.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
             // 
-            // checkBox2
+            // label6
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(130, 141);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(174, 24);
-            this.checkBox2.TabIndex = 13;
-            this.checkBox2.Tag = "digitaloff,digitalon";
-            this.checkBox2.Text = "Digital Input Enable";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            this.checkBox2.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(3, 6);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(79, 20);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Sensitivity";
             // 
-            // textBoxReceive
+            // panel2
             // 
-            this.textBoxReceive.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxReceive.Location = new System.Drawing.Point(4, 177);
-            this.textBoxReceive.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.textBoxReceive.Multiline = true;
-            this.textBoxReceive.Name = "textBoxReceive";
-            this.textBoxReceive.Size = new System.Drawing.Size(209, 42);
-            this.textBoxReceive.TabIndex = 8;
+            this.panel2.Controls.Add(this.label7);
+            this.panel2.Controls.Add(this.comboBox2);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 203);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(290, 40);
+            this.panel2.TabIndex = 18;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(3, 3);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(54, 20);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "Graph";
             // 
             // comboBox2
             // 
@@ -351,11 +413,11 @@
             this.comboBox2.Items.AddRange(new object[] {
             "Current",
             "Voltage"});
-            this.comboBox2.Location = new System.Drawing.Point(220, 175);
+            this.comboBox2.Location = new System.Drawing.Point(166, 0);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 28);
             this.comboBox2.TabIndex = 15;
-            this.comboBox2.Tag = "graphcurr,graphvolt";
+            this.comboBox2.Tag = "graphvolt,graphcurr";
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
             // 
             // tabPage2
@@ -928,6 +990,12 @@
             this.tabPage1.ResumeLayout(false);
             this.flowLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel2.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -971,7 +1039,6 @@
         private System.Windows.Forms.ComboBox comboBoxAvailableSerial;
         private System.Windows.Forms.Button buttonConnect;
         private System.Windows.Forms.Button buttonStartPlot;
-        private System.Windows.Forms.TextBox textBoxReceive;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numReadsPerSec;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
@@ -1012,7 +1079,12 @@
         public System.Windows.Forms.ComboBox comboBox1;
         public System.Windows.Forms.CheckBox checkBox2;
         public System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label7;
         public System.Windows.Forms.ComboBox comboBox2;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        public System.Windows.Forms.TextBox textBoxReceive;
     }
 }
 

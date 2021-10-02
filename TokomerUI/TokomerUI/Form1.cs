@@ -432,57 +432,51 @@ namespace CerealPotter
             {
                 var t = _serialPort.GetDevice();
                 if(t!="")
-                {
-                    //AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
-                    //PrincipalPermission principalPerm = new PrincipalPermission(null, WindowsBuiltInRole.Administrator.ToString());
-                    //principalPerm.Demand();
-                    //Console.WriteLine("Demand succeeded.");
+                { 
                     try
                     {
-                        // PrincipalPolicy must be set to WindowsPrincipal to check roles.
-                        AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
-                        // Check using the PrincipalPermissionAttribute
-                        CheckAdministrator();
-                        // we're admin!
-                        DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, false);
+                        if (MessageBox.Show(this, $"Failed to open serial port {_serialPort.PortName}. Do you wish to try resetting it?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                        {
+                            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+                            CheckAdministrator();
+                            // we're admin! just disable and enable the port
+                            DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, false);
+                            DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, true);
+                        }
 
                     }
                     catch (Exception ex)
                     {
-                        if (MessageBox.Show(this, $"Failed to open serial port {_serialPort.PortName}. Do you wish to try resetting it?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                        // we're not admin! span the program as admin to bounce the port 
+                        ProcessStartInfo info = new ProcessStartInfo();
+                        info.FileName = Application.ExecutablePath;
+                        info.UseShellExecute = true;
+                        info.Verb = "runas"; // Provides Run as Administrator
+                        info.Arguments = t;
+                        var newprocess = Process.Start(info);
+                        if (newprocess != null)
                         {
-                            ProcessStartInfo info = new ProcessStartInfo();
-                            info.FileName = Application.ExecutablePath;
-                            info.UseShellExecute = true;
-                            info.Verb = "runas"; // Provides Run as Administrator
-                            info.Arguments = t;
-                            var newprocess = Process.Start(info);
-                            if (newprocess!= null)
+                            while (true)
                             {
-                                while (true)
+                                try
                                 {
-                                    try
-                                    {
-                                        var time = newprocess.StartTime;
-                                        break;
-                                    }
-                                    catch (Exception) { }
+                                    var time = newprocess.StartTime;
+                                    break;
                                 }
-                                newprocess.WaitForExit();
-                                MessageBox.Show(this, $"You can now try to connect again.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                               }
-                            else
-                            {
-                                MessageBox.Show(this, $"Reset cancelled.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                catch (Exception) { }
                             }
-
-                            Console.WriteLine(ex.Message);
+                            newprocess.WaitForExit();
+                            MessageBox.Show(this, $"You can now try to connect again.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show(this, $"Reset cancelled.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         }
                         return;
                     }
 
 
-                    DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, false);
+                    
 
                 }
             }
@@ -568,7 +562,7 @@ private void UpdateTextBox(TextBox txtBox, string msg)
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex);
+                            MessageBox.Show(this, $"Invalid status message {dataRead}. \r\n{ex}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
 
                     }
@@ -618,7 +612,15 @@ private void UpdateTextBox(TextBox txtBox, string msg)
 
             if (control.InvokeRequired)
             {
-                Invoke(new UpdateGraphDel(UpdateGraph), new object[] { control });
+                try
+                {
+                    Invoke(new UpdateGraphDel(UpdateGraph), new object[] { control });
+                }
+                catch (System.ObjectDisposedException )
+                {
+
+                }
+                
                 return;
             }
             lock (lockUpdates[control.GraphPane.YAxis.Title.Text])
