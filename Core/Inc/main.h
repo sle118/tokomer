@@ -56,7 +56,7 @@ typedef struct {
 } serial_binary_packet_t;
 #pragma pack(pop)
 typedef struct {
-	bool gmode;
+	bool graphModeCurrent;
 	bool serialEnable;
 	bool serialBinaryEnable;
 	bool overload;
@@ -146,7 +146,9 @@ extern bool requestedDigitalInputEnable;
 #define SIGNAL_CR_RECEIVED (int32_t) 0x01<<1
 #define SIGNAL_STATE_CHANGE (int32_t) 0x01<<2
 extern bool serial1Initialized;
-extern system_state_t global;
+extern volatile  system_state_t global;
+extern bool statusRequested;
+extern volatile bool dataTransferHold;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

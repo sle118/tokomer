@@ -33,6 +33,10 @@ void enqueue(actions_t cmd) {
 		osThreadYield();
 	}
 	lock = true;
+	if(cmd==ACTION_GET_STATUS)
+	{
+		statusRequested = true;
+	}
 	FIFO_PUSH(queue, cmd);
 	if (FIFO_OVERRUN(queue)) {
 		// well... commands are not processed quick enough!
@@ -147,6 +151,7 @@ void calibrate() {
 					(uint) lsumBusMillVoltsOrig / lreadings,
 					(uint) lsumBusMillVolts / lreadings,
 					(uint) lsumBusMicroAmps / lreadings);
+			enqueue(ACTION_GET_STATUS); //  we're enabling power here
 			_DEBUG("Range 2 K %u\n", ranges[2]);
 			break;
 		case 1:
@@ -161,35 +166,20 @@ static const char* bufferedNumber(int value) {
 	static char buffer[13] = { 0 };
 	return itoa(value, buffer, sizeof(buffer));
 }
-bool prev_enable ;
-bool prev_binaryenable ;
-void holdDataTransfer()
-{
-	prev_enable=global.serialEnable;
-	prev_binaryenable=global.serialBinaryEnable;
-	global.serialEnable=false;
-	global.serialBinaryEnable=false;
-}
-void resumeDataTransfer()
-{
-	global.serialEnable=prev_enable;
-	global.serialBinaryEnable=prev_binaryenable;
-}
-void strncat_flush(char *buffer, const char *value, size_t bufSize) {
-	uint8_t res = USBD_OK;
-	size_t outlen = strlen(buffer);
-	if (!value || (strlen(value) + outlen >= bufSize)) {
-		// disable data transfer to avoid colliding
 
+void strncat_flush(const char *value) {
+	uint8_t res = USBD_OK;
+	size_t outlen = strlen(outBuffer);
+	if (!value || (strlen(value) + outlen >= sizeof(outBuffer)-1)) {
 		do {
 
-			res = CDC_Transmit_FS((uint8_t*) buffer, outlen);
+			res = CDC_Transmit_FS((uint8_t*) outBuffer, outlen);
 		} while (res == USBD_BUSY);
-		memset(buffer, 0x00, bufSize);
+		memset(outBuffer, 0x00, sizeof(outBuffer));
 
 	}
 	if (value) {
-		strncat(buffer, value, bufSize);
+		strncat(outBuffer, value, sizeof(outBuffer)-1);
 	}
 }
 static const char *curly_open = "{";
@@ -203,45 +193,76 @@ static const char *semicolon = ":";
 
 #define ADD_QUOTED_STRING(buffer,value) strncat_flush(buffer,quote,sizeof(buffer)-1); strncat_flush(buffer,value,sizeof(buffer)-1); strncat_flush(buffer,quote,sizeof(buffer)-1);
 #define ADD_VARIABLE_ENTRY(buffer,value) ADD_QUOTED_STRING(buffer,value); strncat_flush(buffer,semicolon,sizeof(buffer)-1)
-#define ADD_BOOL_VALUE(buffer,value) strncat_flush(buffer,(value?"true":"false"),sizeof(buffer)-1);
+#define ADD_BOOL_VALUE(buffer,value) ,sizeof(buffer)-1);
 #define ADD_BOOL_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name); ADD_BOOL_VALUE(buffer,value); if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
 #define ADD_STRING_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name); ADD_QUOTED_STRING(buffer,value) if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
-#define ADD_INTEGER_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name); strncat_flush(buffer,bufferedNumber(value),sizeof(buffer)-1);   if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
+#define ADD_INTEGER_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name);    if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
 
 
 //"graphvolt", "graphcurr", "serialon", "serialoff", "poweron", "poweroff", "sclale0",
 //		"sclale1", "sclale2", "sclale3", "digitalon", "digitaloff", "status","help",
 //"binaryon","binaryoff"
+void addVar(const char * name)
+{
+	strncat_flush(quote);
+	strncat_flush(name);
+	strncat_flush(quote);
+	strncat_flush(semicolon);
+}
+void addStringVar(const char * name, const char * value, bool last)
+{
+	addVar(name);
+	strncat_flush(quote);
+	strncat_flush(value);
+	strncat_flush(quote);
+	if(!last) strncat_flush(comma);
+}
 
+void addBoolVar(const char * name, bool value, bool last)
+{
+	addVar(name);
+	strncat_flush(value?"true":"false");
+	if(!last) strncat_flush(comma);
+}
+void addIntVar(const char * name, int value, bool last)
+{
+	addVar(name);
+	strncat_flush(bufferedNumber(value));
+	if(!last) strncat_flush(comma);
+}
 void reportStatus() {
 	memset(outBuffer, 0x00, sizeof(outBuffer));
-	holdDataTransfer();
-	strncat_flush(outBuffer, curly_open, sizeof(outBuffer) - 1);
-	ADD_STRING_VARIABLE(outBuffer, "graph", global.gmode>0?"volt":"curr", false);
-	ADD_BOOL_VARIABLE(outBuffer, "serial", global.serialEnable, false);
-	ADD_BOOL_VARIABLE(outBuffer, "power", (global.power > 0), false);
-	ADD_INTEGER_VARIABLE(outBuffer, "scale", global.rangeScale, false);
-	ADD_BOOL_VARIABLE(outBuffer, "digital", (global.digitalInputEnable > 0),false);
-	ADD_BOOL_VARIABLE(outBuffer, "binary", global.serialBinaryEnable, false);
-	ADD_BOOL_VARIABLE(outBuffer, "overload", global.overload, false);
-	ADD_VARIABLE_ENTRY(outBuffer, "commands");
-	strncat_flush(outBuffer, square_open, sizeof(outBuffer) - 1);
+	dataTransferHold=true;
+	strncat_flush(curly_open);
+	addStringVar("graph", !global.graphModeCurrent?"volt":"curr", false);
+	addBoolVar("serial", global.serialEnable, false);
+	addBoolVar("power", global.power , false);
+	addIntVar("scale", global.rangeScale, false);
+	addBoolVar("digital", global.digitalInputEnable,false);
+	addBoolVar("binary", global.serialBinaryEnable, false);
+	addBoolVar("overload", global.overload, false);
+	addVar("commands");
+	strncat_flush(square_open);
 	uint8_t cmd_index = 0;
 	do {
 		if (cmd_index > 0) {
-			strncat_flush(outBuffer, comma, sizeof(outBuffer) - 1);
+			strncat_flush(comma);
 		}
-		ADD_QUOTED_STRING(outBuffer, commands_string[cmd_index]);
+		strncat_flush(quote);
+		strncat_flush(commands_string[cmd_index]);
+		strncat_flush(quote);
 		cmd_index++;
 	} while (commands_string[cmd_index] != NULL);
-	strncat_flush(outBuffer, square_close, sizeof(outBuffer) - 1);
-	strncat_flush(outBuffer, curly_close, sizeof(outBuffer) - 1);
-	strncat_flush(outBuffer, "\n", sizeof(outBuffer) - 1);
-	strncat_flush(outBuffer, NULL, sizeof(outBuffer) - 1); // flush the output buffer
-	resumeDataTransfer();
+	strncat_flush(square_close);
+	strncat_flush(curly_close);
+	strncat_flush("\n");
+	strncat_flush(NULL); // flush the output buffer
+	dataTransferHold=false;
+	statusRequested = false;
 }
 void handleCommandQueue() {
 	actions_t cmd;
+	bool reportChange=true;
 	if (!dequeue(&cmd)) {
 		return;
 	}
@@ -253,15 +274,16 @@ void handleCommandQueue() {
 		return;
 	case ACTION_GET_STATUS:
 		reportStatus();
+		return;
 		break;
 	case ACTION_RESET_STATS:
 		reset_stats();
 		break;
 	case ACTION_GRAPH_SELECT_VOLTAGE:
-		global.gmode = 0;
+		global.graphModeCurrent = false;
 		break;
 	case ACTION_GRAPH_SELECT_CURRENT:
-		global.gmode = 1;
+		global.graphModeCurrent = true;
 		break;
 	case ACTION_SERIAL_ON:
 		global.serialBinaryEnable = false;
@@ -306,11 +328,11 @@ void handleCommandQueue() {
 	default:
 		break;
 	}
+	if(reportChange) {
+		enqueue(ACTION_GET_STATUS);
+	}
 }
-void process() {
-	handleCommandQueue();
-	calibrate();
-}
+
 //
 // Small code snip taken here
 // https://hackaday.io/project/20879-notes-on-using-systemworkbench-with-stm32-bluepill/log/57048-hints-for-using-the-cdc-usb-serial
@@ -343,14 +365,7 @@ uint8_t VCP_read_line(uint8_t *Buf, uint32_t Len) {
 	}
 	return count;
 }
-static system_state_t prevstate = { 0 };
-void StateChangeCheck() {
-	if (memcmp(&prevstate, (const void *)&global, sizeof(prevstate)) != 0) {
-		enqueue(ACTION_GET_STATUS);
-		memcpy(&prevstate, (const void *)&global, sizeof(prevstate));
-	}
 
-}
 void USBRx(void const *arg) {
 	osHandlehandleUSBDataRXId = osThreadGetId();
 	uint8_t CommandBuffer[15] = { 0 };
@@ -376,7 +391,6 @@ void USBRx(void const *arg) {
 			}
 
 		}
-		StateChangeCheck();
 	}
 
 }

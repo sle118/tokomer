@@ -20,6 +20,7 @@ using DisableDevice;
 using System.Security.Permissions;
 using System.Security.Principal;
 using System.Diagnostics;
+using System.Text;
 
 namespace CerealPotter
 {
@@ -38,6 +39,7 @@ namespace CerealPotter
         Dictionary<string, object> lockUpdates = new Dictionary<string, object>();
         NumberFormat numberFormat = new NumberFormat();
         SerialParser parser;
+        SerialParserBinary binaryParser;
         bool isSerialPortSelectChange = false;
         System.Timers.Timer updateTimer = new System.Timers.Timer(250);
         System.Diagnostics.Stopwatch elapsed = new System.Diagnostics.Stopwatch();
@@ -45,25 +47,32 @@ namespace CerealPotter
         public static event EventHandler MouseEnter;
         ActionPoints<AveragePoints> actionPoints;
         private bool StatusUpdateFromDevice = false;
+        private Dictionary<string, Control> ControlList;
         private delegate void UpdateTextboxDel(TextBox txtBox, string msg);
         private delegate void UpdateDel(Control lbl, string text);
+        private delegate void DisableEnableDel(Control lbl, bool disable);
         private delegate void UpdateGraphDel(CustomGraphControl control);
+        SystemStatus systemStatus;
 
         public Form1()
         {
             InitializeComponent();
             GetSerialPortList();
-
             toolStripProgressBar1.Visible = false;
             Visible = true;
             FormClosed += Form1_FormClosed;
             _serialPort = new SerialPort();
             _serialPort.DataReceived += _serialPort_DataReceived;
+            systemStatus = new SystemStatus(Controls, _serialPort);
+            systemStatus.TagUpdated += SetControlTag;
+            Controls.FindControlTags(ref ControlList);
+
             graphMover.MoveCompleted += MoveCompletedEventHandler;
             CreateGraphControls();
             updateTimer.AutoReset = true;
             updateTimer.Elapsed += OnUpdateEvent;
             parser = new SerialParser(storage.curve_multipliers, storage.curve_names);
+            binaryParser = new SerialParserBinary(storage.curve_multipliers, storage.curve_names);
             // Set window location
             if (Settings.Default.WindowLocation != null)
             {
@@ -396,7 +405,6 @@ namespace CerealPotter
         }
         private void buttonConnect_Click(object sender, EventArgs e)
         {
-
             if (comboBoxAvailableSerial.SelectedIndex == -1) return;
             if (_serialPort.IsOpen)
             {
@@ -407,10 +415,10 @@ namespace CerealPotter
                 catch (Exception)
                 {
 
-                    
+
                 }
-                
                 buttonConnect.Text = "Connect";
+                SetStatusControlsEnable(true);
                 return;
             }
             string portSelect = comboBoxAvailableSerial.SelectedItem.ToString();
@@ -422,78 +430,85 @@ namespace CerealPotter
             }
             _serialPort.PortName = portSelect;
             _serialPort.BaudRate = 115200;
-            try
+            bool tryAgain = true;
+            do
             {
-                _serialPort.Open();
-                buttonConnect.Text = "Disconnect";
-                _serialPort.WriteLine("status");
-            }
-            catch (System.IO.IOException)
-            {
-                var t = _serialPort.GetDevice();
-                if(t!="")
-                { 
-                    try
-                    {
-                        if (MessageBox.Show(this, $"Failed to open serial port {_serialPort.PortName}. Do you wish to try resetting it?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
-                        {
-                            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
-                            CheckAdministrator();
-                            // we're admin! just disable and enable the port
-                            DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, false);
-                            DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, true);
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        // we're not admin! span the program as admin to bounce the port 
-                        ProcessStartInfo info = new ProcessStartInfo();
-                        info.FileName = Application.ExecutablePath;
-                        info.UseShellExecute = true;
-                        info.Verb = "runas"; // Provides Run as Administrator
-                        info.Arguments = t;
-                        var newprocess = Process.Start(info);
-                        if (newprocess != null)
-                        {
-                            while (true)
-                            {
-                                try
-                                {
-                                    var time = newprocess.StartTime;
-                                    break;
-                                }
-                                catch (Exception) { }
-                            }
-                            newprocess.WaitForExit();
-                            MessageBox.Show(this, $"You can now try to connect again.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show(this, $"Reset cancelled.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                        }
-                        return;
-                    }
-
-
-                    
-
+                try
+                {
+                    _serialPort.Open();
+                    buttonConnect.Text = "Disconnect";
+                    _serialPort.WriteLine("status");
+                    WaitforResponse();
+                    tryAgain = false;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unable to open serial port {portSelect}. {ex.Message}");
+                catch (System.IO.IOException)
+                {
+                    var t = _serialPort.GetDevice();
+                    if (t != "")
+                    {
+                        try
+                        {
+                            if (MessageBox.Show(this, $"Failed to open serial port {_serialPort.PortName}. Do you wish to try resetting it?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                            {
+                                AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+                                CheckAdministrator();
+                                // we're admin! just disable and enable the port
+                                DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, false);
+                                DeviceHelper.SetDeviceEnabled(new Guid("{4d36e978-e325-11ce-bfc1-08002be10318}"), t, true);
+                            }
+                            else
+                            {
+                                tryAgain = false;
+                            }
 
-            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // we're not admin! span the program as admin to bounce the port 
+                            ProcessStartInfo info = new ProcessStartInfo();
+                            info.FileName = Application.ExecutablePath;
+                            info.UseShellExecute = true;
+                            info.Verb = "runas"; // Provides Run as Administrator
+                            info.Arguments = t;
+                            var newprocess = Process.Start(info);
+                            if (newprocess != null)
+                            {
+                                while (true)
+                                {
+                                    try
+                                    {
+                                        var time = newprocess.StartTime;
+                                        break;
+                                    }
+                                    catch (Exception) { }
+                                }
+                                newprocess.WaitForExit();
+                            }
+                            else
+                            {
+                                MessageBox.Show(this, $"Reset cancelled.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                tryAgain = false;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to open serial port {portSelect}. {ex.Message}");
+                    tryAgain = false;
+                }
+            } while (tryAgain);
         }
-            
-    [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
-    static void CheckAdministrator()
-    {
-        Console.WriteLine("User is an administrator");
-    }
 
-private void UpdateTextBox(TextBox txtBox, string msg)
+        [PrincipalPermission(SecurityAction.Demand, Role = "Administrators")]
+        static void CheckAdministrator()
+        {
+            Console.WriteLine("User is an administrator");
+        }
+
+
+
+        private void UpdateTextBox(TextBox txtBox, string msg)
         {
             if (txtBox.InvokeRequired)
             {
@@ -502,89 +517,53 @@ private void UpdateTextBox(TextBox txtBox, string msg)
             }
             txtBox.Text = msg;
         }
-        class SystemStatus
-        {
-            public string graph;
-            public bool serial;
-            public bool power;
-            public int scale;
-            public bool digital;
-            public bool binary;
-            public bool overload;
-            public string[] commands;
-        };
 
         private void _serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            List<byte> _buffer = new List<byte>();
+            ASCIIEncoding encoding = new ASCIIEncoding();
             try
             {
+
+
                 while (_serialPort.BytesToRead > 0)
                 {
-                    string dataRead = _serialPort.ReadLine();
-                    if (dataRead[0] == '{')
+                    byte ch = (byte)_serialPort.ReadByte();
+                    if (ch != '\n')
                     {
-                        try
-                        {
-                            
-                            SystemStatus status = JsonConvert.DeserializeObject<SystemStatus>(dataRead);
-                            StatusUpdateFromDevice = true;
-                            ExtensionMethods.controlList.Clear();
-                            foreach (MemberInfo tag in status.GetType().GetMembers().Where(m => m.MemberType == System.Reflection.MemberTypes.Field))
-                            {
-                                
-                                Control ctrl = Controls.FindTag(tag.Name);
-                                if (ctrl == null) continue;
-                                if (tag.GetUnderlyingType() == typeof(string))
-                                {
-                                    if (status.GetValue(tag, out string fullvalue))
-                                    {
-                                        SetControlTag(ctrl,tag.Name + fullvalue);
-                                    }
-                                    //var fullval = tag.Name+status.GetType().GetMember(tag).GetValue()
-                                }
-                                else if (tag.GetUnderlyingType() == typeof(bool))
-                                {
-                                    if (status.GetValue(tag, out bool boolvalue))
-                                    {
-                                        SetControlTag(ctrl, tag.Name + (boolvalue ? "on" : "off"));
-                                    }
-                                }
-                                else if (tag.GetUnderlyingType() == typeof(int))
-                                {
-                                    if (status.GetValue(tag, out int intValue))
-                                    {
-                                        SetControlTag(ctrl, tag.Name + intValue.ToString());
-                                    }
-                                }
+                        _buffer.Add(ch);
+                        continue;
+                    }
 
-                                Console.WriteLine();
-                            }
-                            StatusUpdateFromDevice = false;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(this, $"Invalid status message {dataRead}. \r\n{ex}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                    string line = encoding.GetString(_buffer.ToArray());
 
+                    if (systemStatus.ParseSerial(line))
+                    {
+                        ResponseReceived();
                     }
                     else
                     {
                         // data is received
                         if (chkShowDataRead.Checked)
                         {
-                            UpdateTextBox(textBoxReceive, dataRead);
+                            UpdateTextBox(textBoxReceive, line);
                         }
 
+
+                        Dictionary<string, double> records = binaryParser.ParsingMatch(_buffer.ToArray());
+                        if (records.Count == 0) records = parser.ParsingMatch(line);
+                        if (records.Count == 0) return;
                         if (isPlotting)
                         {
-                            Dictionary<string, double> records = parser.ParsingMatch(dataRead);
-                            if (records.Count == 0) return;
                             count++;
 
                             UpdataSignal(records);
-
                         }
+
                     }
+                    _buffer.Clear();
+
+
                 }
 
             }
@@ -617,11 +596,11 @@ private void UpdateTextBox(TextBox txtBox, string msg)
                 {
                     Invoke(new UpdateGraphDel(UpdateGraph), new object[] { control });
                 }
-                catch (System.ObjectDisposedException )
+                catch (System.ObjectDisposedException)
                 {
 
                 }
-                
+
                 return;
             }
             lock (lockUpdates[control.GraphPane.YAxis.Title.Text])
@@ -634,6 +613,10 @@ private void UpdateTextBox(TextBox txtBox, string msg)
                 control.UpdateAxis();
                 control.Invalidate();
             }
+        }
+        private void Disable(Control control)
+        {
+
         }
         private void UpdateGraph()
         {
@@ -1061,7 +1044,7 @@ private void UpdateTextBox(TextBox txtBox, string msg)
         }
         #endregion FileOperations
 
-        
+
 
         private void handleCheckBoxes_CheckedChanged(object sender, EventArgs e)
         {
@@ -1070,57 +1053,45 @@ private void UpdateTextBox(TextBox txtBox, string msg)
                 MessageBox.Show(this, $"Connect first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            processCommandControl(sender as Control);
-        }
-        private void processCommandControl(Control ctrl)
-        {
-            string command = "";
-            if (StatusUpdateFromDevice) return; // ignore the first sync to avoid needless calls to backend
-            string[] commands = ctrl.Tag.ToString().Split(',');
-            if (ctrl.GetType() == typeof(CheckBox))
-            {
-                command = (ctrl as CheckBox).Checked ?  commands[1]: commands[0];
-            }
-            else if (ctrl.GetType() == typeof(ComboBox))
-            {
-                command = commands[(ctrl as ComboBox).SelectedIndex];
-            }
-            if (string.IsNullOrEmpty(command)) return;
-            _serialPort.WriteLine(command);
-
+            if (StatusUpdateFromDevice) return;
+            WaitforResponse();
+            systemStatus.ProcessCommandControl(sender as Control);
         }
 
         private void comboBox1_TextChanged(object sender, EventArgs e)
         {
-            processCommandControl(sender as Control);
+            if (StatusUpdateFromDevice) return;
+            systemStatus.ProcessCommandControl(sender as Control);
         }
-        public delegate void UpdateControl(Control control, string value);
-        public void SetControlTag(Control control, string value)
+        public delegate void UpdateControl(object sender, SystemStatus.TagUpdateEventArgs args);
+        public void SetControlTag(object sender, SystemStatus.TagUpdateEventArgs args)
         {
-            if (control.Tag == null) return;
-            int position = control.Tag.ToString().Split(',').ToList().IndexOf(value);
+            if (args.Control.Tag == null) return;
+            int position = args.Control.Tag.ToString().Split(',').ToList().IndexOf(args.Tag);
             if (position < 0) return;
-            if (control.InvokeRequired)
+            if (args.Control.InvokeRequired)
             {
-                Invoke(new UpdateControl(SetControlTag), new object[] { control, value });
+                Invoke(new UpdateControl(SetControlTag), new object[] { sender, args });
                 return;
             }
             try
             {
-                if (control.GetType() == typeof(ComboBox))
+                StatusUpdateFromDevice = true;
+                if (args.Control.GetType() == typeof(ComboBox))
                 {
-                    ((ComboBox)control).SelectedIndex = position;
+                    ((ComboBox)args.Control).SelectedIndex = position;
                     Invalidate();
                 }
-                else if (control.GetType() == typeof(CheckBox))
+                else if (args.Control.GetType() == typeof(CheckBox))
                 {
-                    ((CheckBox)control).Checked = position > 0;
+                    ((CheckBox)args.Control).Checked = position > 0;
                     Invalidate();
                 }
                 else
                 {
                     return;
                 }
+                StatusUpdateFromDevice = false;
             }
             catch (Exception e)
             {
@@ -1131,6 +1102,35 @@ private void UpdateTextBox(TextBox txtBox, string msg)
 
             return;
         }
+        private void EnableDisableDelegate(Control ctrl, bool enableDisable)
+        {
+            ctrl.Enabled = enableDisable;
+        }
+        public void WaitforResponse()
+        {
+            SetStatusControlsEnable(false);
+
+        }
+        public void ResponseReceived()
+        {
+            SetStatusControlsEnable(true);
+        }
+        private void SetStatusControlsEnable(bool enable)
+        {
+            foreach (var ctrlKvp in ControlList)
+            {
+                if (ctrlKvp.Value.InvokeRequired)
+                {
+                    Invoke(new DisableEnableDel(EnableDisableDelegate), new object[] { ctrlKvp.Value, enable });
+                }
+                else
+                {
+                    EnableDisableDelegate(ctrlKvp.Value, enable);
+                }
+            }
+        }
+
     }
+
 
 }

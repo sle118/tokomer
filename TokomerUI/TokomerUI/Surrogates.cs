@@ -42,6 +42,7 @@ namespace CerealPotter
         public static implicit operator RollingPointPairListSurrogate(RollingPointPairList values)
         {
             var pointPairs = new List<PointPair>();
+            if(values ==null) return null;
             RollingPointPairListSurrogate surrogate = new RollingPointPairListSurrogate() { pointPairs=pointPairs,Capacity=values.Capacity };
             for (int i = 0; i < values.Count; i++)
             {
@@ -54,6 +55,7 @@ namespace CerealPotter
         public static implicit operator ZedGraph.RollingPointPairList(RollingPointPairListSurrogate value)
         {
             RollingPointPairList result = new RollingPointPairList(value.Capacity);
+            if (value == null || value.pointPairs == null) return result;
             for (int i = 0; i < value.pointPairs.Count; i++)
             {
                 result.Add(value.pointPairs[i]);

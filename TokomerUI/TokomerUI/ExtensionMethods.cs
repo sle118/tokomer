@@ -384,7 +384,39 @@ public static class ExtensionMethods
 
         return null;
     }
-    
+    public static Dictionary<string, Control> FindControlTags(this Control.ControlCollection controls, ref Dictionary<string,Control> list)
+    {
+        if(list==null)
+        {
+            list = new Dictionary<string, Control>();
+        }
+        try
+        {
+            foreach (Control c in controls)
+            {
+                if (c.Tag != null)
+                {
+                    
+                    var values = c.Tag.ToString().Split(',');
+                    foreach (string ctrlTag in values)
+                    {
+                        list.Add(ctrlTag, c);
+                    }
+
+                }
+                if (c.HasChildren || (c.Controls != null && c.Controls.Count > 0))
+                {
+                    c.Controls.FindControlTags(ref list); //Recursively check all children controls as well; ie groupboxes or tabpages
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show(null, $"Error {e.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+        return list;
+    }
+
     static public string GetDevice(this SerialPort serialPort)
     {
         using (var searcher = new ManagementObjectSearcher

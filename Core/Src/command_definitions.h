@@ -43,9 +43,10 @@ extern "C" {
 void initialize_commands();
 void enqueue(actions_t cmd);
 bool dequeue(actions_t * cmd);
-void process();
 command_result_t process_inbound_serial(const char *cmd_line);
 command_result_t handle_command_string(const char *cmd_string) ;
+void handleCommandQueue();
+void calibrate();
 void USBRx(void const *arg);
 #ifdef __cplusplus
 }

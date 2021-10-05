@@ -190,6 +190,7 @@
     <Compile Include="PointObj.cs" />
     <Compile Include="SerialParserBinary.cs" />
     <Compile Include="Surrogates.cs" />
+    <Compile Include="SystemStatus.cs" />
     <Compile Include="ZScore.cs" />
     <Compile Include="CustomGraphControl.cs">
       <SubType>UserControl</SubType>

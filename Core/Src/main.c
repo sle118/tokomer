@@ -528,8 +528,8 @@ void USR_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 //	uint8_t rangeScale;
 //	bool digitalInputEnable;
 //}
-system_state_t global = {0};;
-
+volatile system_state_t global = {0};;
+bool statusRequested=false;
 int32_t miliVolts = 0;
 int32_t microAmps = 0;
 serial_binary_packet_t binary_packet={ .header=PACKET_HEADER_START,.current=0,.voltage=0,.eol='\n' };
@@ -558,7 +558,7 @@ uint8_t forcedRange = 0; // 0 - not forced, 1 - 5 Ohm, 2 - 0.5 Ohm, 3 - 0.05 Ohm
 bool serial1Initialized=false;
 bool requestedDigitalInputEnable=false;
 uint16_t ranges[4] = { 0, 128, 1222, 10683 };
-
+volatile bool dataTransferHold=false;
 uint32_t rangeScales[4][4] = { { 11000, 12000, 110000, 120000 }, { 5500, 6000,
 		55000, 60000 }, { 2750, 3000, 27500, 30000 },
 		{ 1100, 1200, 11000, 12000 }, };
@@ -862,48 +862,50 @@ void StartDefaultTask(void const *argument) {
 				PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
 			}
 		}
-
-		if (global.serialEnable) {
-			itoa(microAmps, pageBuf, 10);
-			uint8_t len = strlen(pageBuf);
-			pageBuf += len;
-			*(pageBuf++) = ',';
-			usbLen += len + 1;
-			itoa(miliVolts / 10, pageBuf, 10);
-			len = strlen(pageBuf);
-			pageBuf += len;
-			*(pageBuf++) = '\n';
-			usbLen += len + 1;
-
-			// 14 is maxium line size that we can send -1800000,1200n
-			// so as soon as have less than that we need to send them out
-			if (usbLen > USB_SERIAL_TX_BUF_SIZE - 14) {
-				usbToSendBuf = (uint8_t*) bufUsb[usbPage];
-				usbToSendSize = usbLen;
-				// signalize that we have some data to send
-				osSignalSet(osflushUsbBufferThreadId, 0x1);
-				usbPage = (usbPage + 1) % 2;
-				usbLen = 0;
-				pageBuf = bufUsb[usbPage];
-			}
-		}
-		else if(global.serialBinaryEnable)
+		if(!dataTransferHold && global.power)
 		{
-			binary_packet.current=(int16_t)microAmps;
-			binary_packet.voltage=(int16_t)miliVolts / 10;
-			memcpy(pageBuf,&binary_packet,sizeof(binary_packet));
-			pageBuf += sizeof(binary_packet);
-			usbLen += sizeof(binary_packet) ;
-			// so as soon as have less than a full packet size,
-			// we need to flush the buffer
-			if (usbLen > USB_SERIAL_TX_BUF_SIZE-sizeof(binary_packet) ) {
-				usbToSendBuf = (uint8_t*) bufUsb[usbPage];
-				usbToSendSize = usbLen;
-				// signalize that we have some data to send
-				osSignalSet(osflushUsbBufferThreadId, 0x1);
-				usbPage = (usbPage + 1) % 2;
-				usbLen = 0;
-				pageBuf = bufUsb[usbPage];
+			if (global.serialEnable) {
+				itoa(microAmps, pageBuf, 10);
+				uint8_t len = strlen(pageBuf);
+				pageBuf += len;
+				*(pageBuf++) = ',';
+				usbLen += len + 1;
+				itoa(miliVolts / 10, pageBuf, 10);
+				len = strlen(pageBuf);
+				pageBuf += len;
+				*(pageBuf++) = '\n';
+				usbLen += len + 1;
+
+				// 14 is maxium line size that we can send -1800000,1200n
+				// so as soon as have less than that we need to send them out
+				if (usbLen > USB_SERIAL_TX_BUF_SIZE - 14) {
+					usbToSendBuf = (uint8_t*) bufUsb[usbPage];
+					usbToSendSize = usbLen;
+					// signalize that we have some data to send
+					osSignalSet(osflushUsbBufferThreadId, 0x1);
+					usbPage = (usbPage + 1) % 2;
+					usbLen = 0;
+					pageBuf = bufUsb[usbPage];
+				}
+			}
+			else if(global.serialBinaryEnable)
+			{
+				binary_packet.current=(int16_t)microAmps;
+				binary_packet.voltage=(int16_t)miliVolts / 10;
+				memcpy(pageBuf,&binary_packet,sizeof(binary_packet));
+				pageBuf += sizeof(binary_packet);
+				usbLen += sizeof(binary_packet) ;
+				// so as soon as have less than a full packet size,
+				// we need to flush the buffer
+				if (usbLen > USB_SERIAL_TX_BUF_SIZE-sizeof(binary_packet) ) {
+					usbToSendBuf = (uint8_t*) bufUsb[usbPage];
+					usbToSendSize = usbLen;
+					// signalize that we have some data to send
+					osSignalSet(osflushUsbBufferThreadId, 0x1);
+					usbPage = (usbPage + 1) % 2;
+					usbLen = 0;
+					pageBuf = bufUsb[usbPage];
+				}
 			}
 		}
 

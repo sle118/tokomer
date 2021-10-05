@@ -23,8 +23,9 @@ uint16_t buttonTime;
 uint8_t buttonCode;
 
 char sbuf[32];
-void printFloat(float v, int8_t maxDigits, bool enlargeForMinus,
+void printFloat(int x, int y,float v, int8_t maxDigits, bool enlargeForMinus,
 		const char *suffix) {
+	oled.setCursor(x, y);
 	float ov = v;
 	v = abs(v);
 	itoa((int) v, sbuf, 10);
@@ -61,7 +62,7 @@ void handleButtons() {
 			enqueue(ACTION_RESET_STATS);
 		} else if (buttonCode == KEY1) {
 			// short KEY3 - toggle voltage o current graph
-			if (global.gmode) {
+			if (!global.graphModeCurrent) {
 				enqueue(ACTION_GRAPH_SELECT_CURRENT);
 			} else {
 				enqueue(ACTION_GRAPH_SELECT_VOLTAGE);
@@ -109,10 +110,9 @@ void handleButtons() {
 		buttonTime += 100;
 	return;
 }
-
+#define CHAR_FLIP_FLOP(x) (? x : ' ')
 void updateScreenX(void const *arg) {
 	osUpdateScreenThreadId = osThreadGetId();
-
 	oled.initialise();
 	oled.clear();
 	oled.set_contrast(255);
@@ -124,18 +124,20 @@ void updateScreenX(void const *arg) {
 		osSignalWait(0x1, 1000);
 		// code here normall executes every ~100ms
 		handleButtons();
-		process();
+		handleCommandQueue();
+		calibrate();
 		// voltage
 		oled.clear();
 		v = (float) (lsumBusMillVolts / lreadings) / 1000;
-		oled.setCursor(0, 0);
-		printFloat(v, 3, false, "v");
+		printFloat(0,0,v, 3, false, "v");
+		oled.setCursor(6, 0);
 
-		if (global.serialEnable) {
-			oled.setCursor(6, 0);
-			oled.putc(pidx % 2 ? '^' : ' ');
+		if(global.power && (global.serialEnable || global.serialBinaryEnable )) {
+			oled.putc(pidx % 2?' ':global.serialEnable?'^':'*');
 		}
-
+		else {
+			oled.putc(' ');
+		}
 		// time
 
 		itoa(lnow / 3600000, sbuf, 10);
@@ -159,7 +161,7 @@ void updateScreenX(void const *arg) {
 		}
 
 		int32_t *lpmin, *lpmax, *lpavg;
-		if (global.gmode == 0) {
+		if (global.graphModeCurrent ) {
 			lpmin = plot1;
 			lpmax = plot;
 			lpavg = plot2;
@@ -182,7 +184,7 @@ void updateScreenX(void const *arg) {
 		}
 		if (pmax == pmin)
 			pmax += 1; // protect from device by zero
-		if (global.power == 1 || global.overload == 1) {
+		if (global.power || global.overload ) {
 			scale = ((1 << 25) * 36) / (pmax - pmin);
 			uint8_t idx_start =
 					didx > 0 ? ((pidx - (127 - didx)) % 128) : (pidx + 1) % 128;
@@ -190,7 +192,7 @@ void updateScreenX(void const *arg) {
 				uint8_t idx = (i + idx_start) % 128;
 				uint8_t min = ((scale * (lpmin[idx] - pmin)) >> 25);
 				uint8_t max = ((scale * (lpmax[idx] - pmin)) >> 25);
-				if (lpmax[idx] - lpmin[idx] <= (global.gmode == 0 ? 8 : 60)) {
+				if (lpmax[idx] - lpmin[idx] <= (global.graphModeCurrent ? 8 : 60)) {
 					oled.set_pixel(oidx,
 							52 - ((scale * (lpavg[idx] - pmin)) >> 25));
 				} else {
@@ -210,22 +212,17 @@ void updateScreenX(void const *arg) {
 			}
 
 			// current mA
-			oled.setCursor(0, 1);
-			printFloat((float) (lsumBusMicroAmps / lreadings) / 1000, 4, false,
-					"mA");
+			printFloat(0,1,(float) (lsumBusMicroAmps / lreadings) / 1000, 4, false,"mA");
 
 			// max value on grath
-			oled.setCursor(0, 7);
-			printFloat((float) pmin / 1000, global.gmode == 0 ? 4 : 3, true,
-					global.gmode == 0 ? "mA" : "v");
+			printFloat(0,7,(float) pmin / 1000, global.graphModeCurrent ? 4 : 3, true,
+					global.graphModeCurrent ? "mA" : "v");
 
-			oled.setCursor(9, 7);
-			printFloat((float) pmax / 1000, global.gmode == 0 ? 4 : 3, false,
-					global.gmode == 0 ? "mA" : "v");
+			printFloat(9,7,(float) pmax / 1000, global.graphModeCurrent? 4 : 3, false,
+					global.graphModeCurrent ? "mA" : "v");
 
 			// mAh
-			oled.setCursor(8, 1);
-			printFloat((float) (ltotalBusMicroAmps / lnow) / 1000, 4, false,
+			printFloat(8,1,(float) (ltotalBusMicroAmps / lnow) / 1000, 4, false,
 					"mAh");
 		}
 
