@@ -73,10 +73,10 @@ void handleButtons() {
 		if (buttonCode == KEY2) {
 			if (buttonTime > 500) {
 				// long KEY2, toogle sending data
-				if (global.serialEnable) {
-					enqueue(ACTION_SERIAL_OFF);
+				if (global.serial==SERIAL_OFF) {
+					enqueue(ACTION_SERIAL_TEXT);
 				} else {
-					enqueue(ACTION_SERIAL_ON);
+					enqueue(ACTION_SERIAL_OFF);
 				}
 			} else {
 				switch (global.rangeScale) {
@@ -131,8 +131,8 @@ void updateScreenX(void const *arg) {
 		printFloat(0,0,v, 3, false, "v");
 		oled.setCursor(6, 0);
 
-		if(global.power && (global.serialEnable || global.serialBinaryEnable )) {
-			oled.putc(pidx % 2?' ':global.serialEnable?'^':'*');
+		if(global.power && (global.serial!=SERIAL_OFF)) {
+			oled.putc(pidx % 2?' ':global.serial==SERIAL_TEXT?'^':'*');
 		}
 		else {
 			oled.putc(' ');

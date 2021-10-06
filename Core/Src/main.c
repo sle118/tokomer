@@ -864,9 +864,9 @@ void StartDefaultTask(void const *argument) {
 				PACKET_CLEAR_BIT(binary_packet.header,PACKET_SIGNAL_BIT_1);
 			}
 		}
-		if(!dataTransferHold && global.power)
+		if(global.power)
 		{
-			if (global.serialEnable) {
+			if (global.serial==SERIAL_TEXT) {
 				itoa(microAmps, pageBuf, 10);
 				uint8_t len = strlen(pageBuf);
 				pageBuf += len;
@@ -890,7 +890,7 @@ void StartDefaultTask(void const *argument) {
 					pageBuf = bufUsb[usbPage];
 				}
 			}
-			else if(global.serialBinaryEnable)
+			else if(global.serial==SERIAL_BINARY)
 			{
 				binary_packet.current=(int16_t)microAmps;
 				binary_packet.voltage=(int16_t)miliVolts / 10;

@@ -12,9 +12,9 @@ static command_fifo_t queue = { 0 };
 //static actions_t *readptr = &queue[0];
 static char outBuffer[11] = { 0 };
 static const char *commands_string[] = { "NOOP", "reset", "graphvolt",
-		"graphcurr", "serialon", "serialoff", "poweron", "poweroff", "scale0",
+		"graphcurr", "serial0", "serial1", "serial2", "poweron", "poweroff", "scale0",
 		"scale1", "scale2", "scale3", "digitalon", "digitaloff", "status",
-		"binaryon", "binaryoff", "help",
+		"help",
 		NULL };
 
 /* Create FIFO*/
@@ -224,15 +224,16 @@ void addIntVar(const char *name, int value, bool last) {
 }
 void reportStatus() {
 	uint8_t cmd_index = 0;
+	serial_state_t savestate=global.serial;
+	global.serial= SERIAL_HOLD;
 	memset(outBuffer, 0x00, sizeof(outBuffer));
 	dataTransferHold = true;
 	strncat_flush(curly_open);
 	addStringVar("graph", !global.graphModeCurrent ? "volt" : "curr", false);
-	addBoolVar("serial", global.serialEnable, false);
+	addIntVar("serial", savestate, false);
 	addBoolVar("power", global.power, false);
 	addIntVar("scale", global.rangeScale, false);
 	addBoolVar("digital", global.digitalInputEnable, false);
-	addBoolVar("binary", global.serialBinaryEnable, false);
 	addBoolVar("overload", global.overload, false);
 	addVar("rangescales");
 	strncat_flush(square_open);
@@ -277,7 +278,7 @@ void reportStatus() {
 	strncat_flush(curly_close);
 	strncat_flush("\n");
 	strncat_flush(NULL); // flush the output buffer
-	dataTransferHold = false;
+	global.serial=savestate;
 	statusRequested = false;
 	return;
 }
@@ -296,6 +297,7 @@ void handleCommandQueue() {
 		return;
 	case ACTION_GET_STATUS:
 		reportStatus();
+		return;
 		break;
 	case ACTION_RESET_STATS:
 		reset_stats();
@@ -306,12 +308,14 @@ void handleCommandQueue() {
 	case ACTION_GRAPH_SELECT_CURRENT:
 		global.graphModeCurrent = true;
 		break;
-	case ACTION_SERIAL_ON:
-		global.serialBinaryEnable = false;
-		global.serialEnable = true;
+	case ACTION_SERIAL_TEXT:
+		global.serial= SERIAL_TEXT;
+		break;
+	case ACTION_SERIAL_BINARY:
+		global.serial= SERIAL_BINARY;
 		break;
 	case ACTION_SERIAL_OFF:
-		global.serialEnable = false;
+		global.serial= SERIAL_OFF;
 		break;
 	case ACTION_POWER_ON:
 		calibrationStep = MAX_CALIBRATION_STEPS;
@@ -338,13 +342,6 @@ void handleCommandQueue() {
 		break;
 	case ACTION_DIGITALIN_OFF:
 		requestedDigitalInputEnable = false;
-		break;
-	case ACTION_BINARY_ON:
-		global.serialEnable = false;
-		global.serialBinaryEnable = true;
-		break;
-	case ACTION_BINARY_OFF:
-		global.serialBinaryEnable = false;
 		break;
 	default:
 		break;

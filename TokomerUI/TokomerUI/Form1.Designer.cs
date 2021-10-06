@@ -43,7 +43,6 @@
             this.textBoxReceive = new System.Windows.Forms.TextBox();
             this.tableLayoutPanelStates = new System.Windows.Forms.TableLayoutPanel();
             this.checkBoxPower = new System.Windows.Forms.CheckBox();
-            this.checkBoxSerialData = new System.Windows.Forms.CheckBox();
             this.checkBoxBinary = new System.Windows.Forms.CheckBox();
             this.checkBoxDigital = new System.Windows.Forms.CheckBox();
             this.panelScaleCombo = new System.Windows.Forms.Panel();
@@ -91,6 +90,9 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.circularProgressBar1 = new CircularProgressBar.CircularProgressBar();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBoxSerial = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -117,6 +119,7 @@
             this.tableGraphPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkShowDataRead
@@ -278,12 +281,12 @@
             this.tableLayoutPanelStates.AutoSize = true;
             this.tableLayoutPanelStates.ColumnCount = 1;
             this.tableLayoutPanelStates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanelStates.Controls.Add(this.checkBoxPower, 0, 0);
-            this.tableLayoutPanelStates.Controls.Add(this.checkBoxSerialData, 0, 1);
+            this.tableLayoutPanelStates.Controls.Add(this.checkBoxPower, 0, 1);
             this.tableLayoutPanelStates.Controls.Add(this.checkBoxBinary, 0, 2);
             this.tableLayoutPanelStates.Controls.Add(this.checkBoxDigital, 0, 3);
             this.tableLayoutPanelStates.Controls.Add(this.panelScaleCombo, 0, 4);
             this.tableLayoutPanelStates.Controls.Add(this.panelGraphCombo, 0, 5);
+            this.tableLayoutPanelStates.Controls.Add(this.panel1, 0, 0);
             this.tableLayoutPanelStates.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelStates.Location = new System.Drawing.Point(3, 133);
             this.tableLayoutPanelStates.Name = "tableLayoutPanelStates";
@@ -294,7 +297,8 @@
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.Size = new System.Drawing.Size(296, 276);
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelStates.Size = new System.Drawing.Size(296, 366);
             this.tableLayoutPanelStates.TabIndex = 17;
             // 
             // checkBoxPower
@@ -302,37 +306,23 @@
             this.checkBoxPower.AutoSize = true;
             this.checkBoxPower.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBoxPower.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxPower.Location = new System.Drawing.Point(3, 3);
+            this.checkBoxPower.Location = new System.Drawing.Point(3, 63);
             this.checkBoxPower.Name = "checkBoxPower";
-            this.checkBoxPower.Size = new System.Drawing.Size(290, 39);
+            this.checkBoxPower.Size = new System.Drawing.Size(290, 54);
             this.checkBoxPower.TabIndex = 10;
             this.checkBoxPower.Tag = "poweroff,poweron";
             this.checkBoxPower.Text = "Power Enable";
             this.checkBoxPower.UseVisualStyleBackColor = true;
             this.checkBoxPower.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
             // 
-            // checkBoxSerialData
-            // 
-            this.checkBoxSerialData.AutoSize = true;
-            this.checkBoxSerialData.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.checkBoxSerialData.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxSerialData.Location = new System.Drawing.Point(3, 48);
-            this.checkBoxSerialData.Name = "checkBoxSerialData";
-            this.checkBoxSerialData.Size = new System.Drawing.Size(290, 39);
-            this.checkBoxSerialData.TabIndex = 11;
-            this.checkBoxSerialData.Tag = "serialoff,serialon";
-            this.checkBoxSerialData.Text = "Serial Data Transfer";
-            this.checkBoxSerialData.UseVisualStyleBackColor = true;
-            this.checkBoxSerialData.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
-            // 
             // checkBoxBinary
             // 
             this.checkBoxBinary.AutoSize = true;
             this.checkBoxBinary.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBoxBinary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxBinary.Location = new System.Drawing.Point(3, 93);
+            this.checkBoxBinary.Location = new System.Drawing.Point(3, 123);
             this.checkBoxBinary.Name = "checkBoxBinary";
-            this.checkBoxBinary.Size = new System.Drawing.Size(290, 39);
+            this.checkBoxBinary.Size = new System.Drawing.Size(290, 54);
             this.checkBoxBinary.TabIndex = 16;
             this.checkBoxBinary.Tag = "binaryoff,binaryon";
             this.checkBoxBinary.Text = "Binary Data Transfer";
@@ -344,9 +334,9 @@
             this.checkBoxDigital.AutoSize = true;
             this.checkBoxDigital.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBoxDigital.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxDigital.Location = new System.Drawing.Point(3, 138);
+            this.checkBoxDigital.Location = new System.Drawing.Point(3, 183);
             this.checkBoxDigital.Name = "checkBoxDigital";
-            this.checkBoxDigital.Size = new System.Drawing.Size(290, 39);
+            this.checkBoxDigital.Size = new System.Drawing.Size(290, 54);
             this.checkBoxDigital.TabIndex = 13;
             this.checkBoxDigital.Tag = "digitaloff,digitalon";
             this.checkBoxDigital.Text = "Digital Input Enable";
@@ -358,9 +348,9 @@
             this.panelScaleCombo.Controls.Add(this.comboBoxScale);
             this.panelScaleCombo.Controls.Add(this.label6);
             this.panelScaleCombo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelScaleCombo.Location = new System.Drawing.Point(3, 183);
+            this.panelScaleCombo.Location = new System.Drawing.Point(3, 243);
             this.panelScaleCombo.Name = "panelScaleCombo";
-            this.panelScaleCombo.Size = new System.Drawing.Size(290, 39);
+            this.panelScaleCombo.Size = new System.Drawing.Size(290, 54);
             this.panelScaleCombo.TabIndex = 18;
             // 
             // comboBoxScale
@@ -393,9 +383,9 @@
             this.panelGraphCombo.Controls.Add(this.label7);
             this.panelGraphCombo.Controls.Add(this.comboBoxGraph);
             this.panelGraphCombo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelGraphCombo.Location = new System.Drawing.Point(3, 228);
+            this.panelGraphCombo.Location = new System.Drawing.Point(3, 303);
             this.panelGraphCombo.Name = "panelGraphCombo";
-            this.panelGraphCombo.Size = new System.Drawing.Size(290, 45);
+            this.panelGraphCombo.Size = new System.Drawing.Size(290, 60);
             this.panelGraphCombo.TabIndex = 18;
             // 
             // label7
@@ -970,6 +960,41 @@
             this.openFileDialog1.FileName = "openFileDialog1";
             this.openFileDialog1.InitialDirectory = global::CerealPotter.Properties.Settings.Default.DataFileInitialDirectory;
             // 
+            // panel1
+            // 
+            this.panel1.AutoSize = true;
+            this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panel1.Controls.Add(this.comboBoxSerial);
+            this.panel1.Controls.Add(this.label8);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(290, 54);
+            this.panel1.TabIndex = 19;
+            // 
+            // comboBoxSerial
+            // 
+            this.comboBoxSerial.FormattingEnabled = true;
+            this.comboBoxSerial.Items.AddRange(new object[] {
+            "Serial Off",
+            "Serial Text",
+            "Serial Binary"});
+            this.comboBoxSerial.Location = new System.Drawing.Point(166, 3);
+            this.comboBoxSerial.Name = "comboBoxSerial";
+            this.comboBoxSerial.Size = new System.Drawing.Size(121, 28);
+            this.comboBoxSerial.TabIndex = 12;
+            this.comboBoxSerial.Tag = "serial0,serial1,serial2";
+            this.comboBoxSerial.SelectionChangeCommitted += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(3, 6);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(93, 20);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "Serial Mode";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -1019,6 +1044,8 @@
             this.statusStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1076,7 +1103,6 @@
         public CircularProgressBar.CircularProgressBar circularProgressBar1;
         private System.Windows.Forms.Label label6;
         public System.Windows.Forms.CheckBox checkBoxPower;
-        public System.Windows.Forms.CheckBox checkBoxSerialData;
         public System.Windows.Forms.ComboBox comboBoxScale;
         public System.Windows.Forms.CheckBox checkBoxDigital;
         public System.Windows.Forms.CheckBox checkBoxBinary;
@@ -1086,6 +1112,9 @@
         public System.Windows.Forms.ComboBox comboBoxGraph;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanelStates;
         public System.Windows.Forms.TextBox textBoxReceive;
+        private System.Windows.Forms.Panel panel1;
+        public System.Windows.Forms.ComboBox comboBoxSerial;
+        private System.Windows.Forms.Label label8;
     }
 }
 

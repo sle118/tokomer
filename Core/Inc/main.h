@@ -54,16 +54,22 @@ typedef struct {
 	int16_t voltage;
 	char eol;
 } serial_binary_packet_t;
+typedef enum {
+	SERIAL_OFF,
+	SERIAL_TEXT,
+	SERIAL_BINARY,
+	SERIAL_HOLD
+} serial_state_t;
 #pragma pack(pop)
 typedef struct {
 	bool graphModeCurrent;
-	bool serialEnable;
-	bool serialBinaryEnable;
+	serial_state_t serial;
 	bool overload;
 	uint8_t rangeScale;
 	bool digitalInputEnable;
 	bool power;
 } system_state_t;
+
 
 /* USER CODE END ET */
 

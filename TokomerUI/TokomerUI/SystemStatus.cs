@@ -28,15 +28,14 @@ namespace CerealPotter
         // Declare the event.
         public event TagUpdateEventHandler TagUpdated;
         public string graph;
-        public bool serial;
+        public int serial;
         public bool power;
         public int scale;
-        public bool digital;
         public bool binary;
         public bool overload;
         public string[] commands;
         public int[] ranges;
-        public int[][] rangeScales;
+        public int[][] rangescales;
         public Control.ControlCollection Controls;
         private SerialPort _serialPort;
 
@@ -60,7 +59,6 @@ namespace CerealPotter
                 serial = status.serial;
                 power = status.power;
                 scale = status.scale;
-                digital = status.digital;
                 binary = status.binary;
                 overload = status.overload;
                 commands = status.commands;
