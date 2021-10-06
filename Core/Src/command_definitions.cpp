@@ -10,10 +10,11 @@
 static command_fifo_t queue = { 0 };
 //static actions_t *writePtr = &queue[0];
 //static actions_t *readptr = &queue[0];
-static char outBuffer[25] = { 0 };
+static char outBuffer[11] = { 0 };
 static const char *commands_string[] = { "NOOP", "reset", "graphvolt",
 		"graphcurr", "serialon", "serialoff", "poweron", "poweroff", "scale0",
-		"scale1", "scale2", "scale3", "digitalon", "digitaloff", "status","binaryon","binaryoff","help",
+		"scale1", "scale2", "scale3", "digitalon", "digitaloff", "status",
+		"binaryon", "binaryoff", "help",
 		NULL };
 
 /* Create FIFO*/
@@ -33,8 +34,7 @@ void enqueue(actions_t cmd) {
 		osThreadYield();
 	}
 	lock = true;
-	if(cmd==ACTION_GET_STATUS)
-	{
+	if (cmd == ACTION_GET_STATUS) {
 		statusRequested = true;
 	}
 	FIFO_PUSH(queue, cmd);
@@ -162,15 +162,17 @@ void calibrate() {
 		calibrationStep--;
 	}
 }
+char numBuffer[11] = { 0 };
 static const char* bufferedNumber(int value) {
-	static char buffer[13] = { 0 };
-	return itoa(value, buffer, sizeof(buffer));
+	return itoa(value, numBuffer, 10);
 }
-
+static const char* bufferedUnsignedNumber(unsigned value) {
+	return utoa(value, numBuffer, 10);
+}
 void strncat_flush(const char *value) {
 	uint8_t res = USBD_OK;
 	size_t outlen = strlen(outBuffer);
-	if (!value || (strlen(value) + outlen >= sizeof(outBuffer)-1)) {
+	if (!value || (strlen(value) + outlen >= sizeof(outBuffer) - 1)) {
 		do {
 
 			res = CDC_Transmit_FS((uint8_t*) outBuffer, outlen);
@@ -179,7 +181,7 @@ void strncat_flush(const char *value) {
 
 	}
 	if (value) {
-		strncat(outBuffer, value, sizeof(outBuffer)-1);
+		strncat(outBuffer, value, sizeof(outBuffer) - 1);
 	}
 }
 static const char *curly_open = "{";
@@ -190,60 +192,78 @@ static const char *comma = ",";
 static const char *quote = "\"";
 static const char *semicolon = ":";
 
-
-#define ADD_QUOTED_STRING(buffer,value) strncat_flush(buffer,quote,sizeof(buffer)-1); strncat_flush(buffer,value,sizeof(buffer)-1); strncat_flush(buffer,quote,sizeof(buffer)-1);
-#define ADD_VARIABLE_ENTRY(buffer,value) ADD_QUOTED_STRING(buffer,value); strncat_flush(buffer,semicolon,sizeof(buffer)-1)
-#define ADD_BOOL_VALUE(buffer,value) ,sizeof(buffer)-1);
-#define ADD_BOOL_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name); ADD_BOOL_VALUE(buffer,value); if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
-#define ADD_STRING_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name); ADD_QUOTED_STRING(buffer,value) if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
-#define ADD_INTEGER_VARIABLE(buffer,name,value, last) ADD_VARIABLE_ENTRY(buffer,name);    if(!last) strncat_flush(buffer,comma,sizeof(buffer)-1);
-
-
 //"graphvolt", "graphcurr", "serialon", "serialoff", "poweron", "poweroff", "sclale0",
 //		"sclale1", "sclale2", "sclale3", "digitalon", "digitaloff", "status","help",
 //"binaryon","binaryoff"
-void addVar(const char * name)
-{
+void addVar(const char *name) {
 	strncat_flush(quote);
 	strncat_flush(name);
 	strncat_flush(quote);
 	strncat_flush(semicolon);
 }
-void addStringVar(const char * name, const char * value, bool last)
-{
+void addStringVar(const char *name, const char *value, bool last) {
 	addVar(name);
 	strncat_flush(quote);
 	strncat_flush(value);
 	strncat_flush(quote);
-	if(!last) strncat_flush(comma);
+	if (!last)
+		strncat_flush(comma);
 }
 
-void addBoolVar(const char * name, bool value, bool last)
-{
+void addBoolVar(const char *name, bool value, bool last) {
 	addVar(name);
-	strncat_flush(value?"true":"false");
-	if(!last) strncat_flush(comma);
+	strncat_flush(value ? "true" : "false");
+	if (!last)
+		strncat_flush(comma);
 }
-void addIntVar(const char * name, int value, bool last)
-{
+void addIntVar(const char *name, int value, bool last) {
 	addVar(name);
 	strncat_flush(bufferedNumber(value));
-	if(!last) strncat_flush(comma);
+	if (!last)
+		strncat_flush(comma);
 }
 void reportStatus() {
+	uint8_t cmd_index = 0;
 	memset(outBuffer, 0x00, sizeof(outBuffer));
-	dataTransferHold=true;
+	dataTransferHold = true;
 	strncat_flush(curly_open);
-	addStringVar("graph", !global.graphModeCurrent?"volt":"curr", false);
+	addStringVar("graph", !global.graphModeCurrent ? "volt" : "curr", false);
 	addBoolVar("serial", global.serialEnable, false);
-	addBoolVar("power", global.power , false);
+	addBoolVar("power", global.power, false);
 	addIntVar("scale", global.rangeScale, false);
-	addBoolVar("digital", global.digitalInputEnable,false);
+	addBoolVar("digital", global.digitalInputEnable, false);
 	addBoolVar("binary", global.serialBinaryEnable, false);
 	addBoolVar("overload", global.overload, false);
+	addVar("rangescales");
+	strncat_flush(square_open);
+	for (int i = 0; i < NUMBER_OF_RANGES; i++) {
+		if (i > 0)
+			strncat_flush(comma);
+		strncat_flush(square_open);
+		for (int j = 0; j < NUMBER_OF_RANGE_SCALES; j++) {
+			if (j > 0) {
+				strncat_flush(comma);
+			}
+			strncat_flush(bufferedUnsignedNumber(rangeScales[i][j]));
+		}
+		strncat_flush(square_close);
+	}
+	strncat_flush(square_close);
+	strncat_flush(comma);
+	addVar("ranges");
+	strncat_flush(square_open);
+	for (int i = 0; i < NUMBER_OF_RANGES; i++) {
+		if (i > 0) {
+			strncat_flush(comma);
+		}
+		strncat_flush(bufferedUnsignedNumber(ranges[i]));
+	}
+	strncat_flush(square_close);
+	strncat_flush(comma);
+
 	addVar("commands");
 	strncat_flush(square_open);
-	uint8_t cmd_index = 0;
+
 	do {
 		if (cmd_index > 0) {
 			strncat_flush(comma);
@@ -257,12 +277,14 @@ void reportStatus() {
 	strncat_flush(curly_close);
 	strncat_flush("\n");
 	strncat_flush(NULL); // flush the output buffer
-	dataTransferHold=false;
+	dataTransferHold = false;
 	statusRequested = false;
+	return;
 }
 void handleCommandQueue() {
 	actions_t cmd;
-	bool reportChange=true;
+
+	bool reportChange = true;
 	if (!dequeue(&cmd)) {
 		return;
 	}
@@ -274,7 +296,6 @@ void handleCommandQueue() {
 		return;
 	case ACTION_GET_STATUS:
 		reportStatus();
-		return;
 		break;
 	case ACTION_RESET_STATS:
 		reset_stats();
@@ -319,7 +340,7 @@ void handleCommandQueue() {
 		requestedDigitalInputEnable = false;
 		break;
 	case ACTION_BINARY_ON:
-		global.serialEnable=false;
+		global.serialEnable = false;
 		global.serialBinaryEnable = true;
 		break;
 	case ACTION_BINARY_OFF:
@@ -328,7 +349,7 @@ void handleCommandQueue() {
 	default:
 		break;
 	}
-	if(reportChange) {
+	if (reportChange) {
 		enqueue(ACTION_GET_STATUS);
 	}
 }

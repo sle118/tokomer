@@ -113,6 +113,9 @@ void Error_Handler(void);
 
 #define SCREEN_TASK_STACK 200
 #define RX_TASK_STACK 75
+#define NUMBER_OF_RANGES 4
+#define NUMBER_OF_RANGE_SCALES 4
+
 
 /* USER CODE BEGIN Private defines */
 extern osThreadId osUpdateScreenThreadId;
@@ -134,7 +137,6 @@ extern uint8_t forcedRange;
 //extern uint8_t overload;
 //extern bool serialEnable;
 //extern bool serialBinaryEnable;
-extern uint16_t ranges[4];
 extern uint16_t voltageK;
 extern uint16_t refreshT;
 //extern uint8_t power;
@@ -149,6 +151,8 @@ extern bool serial1Initialized;
 extern volatile  system_state_t global;
 extern bool statusRequested;
 extern volatile bool dataTransferHold;
+extern uint32_t rangeScales[NUMBER_OF_RANGES][NUMBER_OF_RANGE_SCALES];
+extern uint16_t ranges[NUMBER_OF_RANGES];
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

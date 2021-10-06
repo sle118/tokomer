@@ -119,7 +119,6 @@ void updateScreenX(void const *arg) {
 	oled.set_font(bold_font, 8);
 
 	float v;
-
 	for (;;) {
 		osSignalWait(0x1, 1000);
 		// code here normall executes every ~100ms

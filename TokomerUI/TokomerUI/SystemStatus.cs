@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
@@ -34,6 +35,8 @@ namespace CerealPotter
         public bool binary;
         public bool overload;
         public string[] commands;
+        public int[] ranges;
+        public int[][] rangeScales;
         public Control.ControlCollection Controls;
         private SerialPort _serialPort;
 

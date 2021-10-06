@@ -84,6 +84,8 @@ void StartDefaultTask(void const *argument);
  * @brief  The application entry point.
  * @retval int
  */
+
+
 int main(void) {
 	/* USER CODE BEGIN 1 */
 
@@ -112,6 +114,7 @@ int main(void) {
 	MX_ADC1_Init();
 	MX_USART1_UART_Init();
 	MX_TIM3_Init();
+	MX_USB_DEVICE_Init();
 	/* USER CODE BEGIN 2 */
 
 	/* USER CODE END 2 */
@@ -131,7 +134,6 @@ int main(void) {
 	/* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
 	/* USER CODE END RTOS_QUEUES */
-
 	/* Create the thread(s) */
 	/* definition and creation of defaultTask */
 	osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
@@ -557,9 +559,9 @@ uint8_t forcedRange = 0; // 0 - not forced, 1 - 5 Ohm, 2 - 0.5 Ohm, 3 - 0.05 Ohm
 //bool serialBinaryEnable = false;
 bool serial1Initialized=false;
 bool requestedDigitalInputEnable=false;
-uint16_t ranges[4] = { 0, 128, 1222, 10683 };
+uint16_t ranges[NUMBER_OF_RANGES] = { 0, 128, 1222, 10683 };
 volatile bool dataTransferHold=false;
-uint32_t rangeScales[4][4] = { { 11000, 12000, 110000, 120000 }, { 5500, 6000,
+uint32_t rangeScales[NUMBER_OF_RANGES][NUMBER_OF_RANGE_SCALES] = { { 11000, 12000, 110000, 120000 }, { 5500, 6000,
 		55000, 60000 }, { 2750, 3000, 27500, 30000 },
 		{ 1100, 1200, 11000, 12000 }, };
 uint16_t voltageK = 17000;
@@ -661,7 +663,7 @@ void configureINA226Mode(uint8_t mode) {
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const *argument) {
 	/* init code for USB_DEVICE */
-	MX_USB_DEVICE_Init();
+
 	/* USER CODE BEGIN 5 */
 	osMainThreadId = osThreadGetId();
 	initialize_commands();
