@@ -685,6 +685,13 @@ namespace CerealPotter
         }
         private void StartRefresh()
         {
+
+
+            if (_serialPort.IsOpen)
+            {
+                if (systemStatus.values.Serial == "serial0") _serialPort.WriteLine("serial2");
+                if (!systemStatus.values.Power) _serialPort.WriteLine("poweron");
+            }
             isPlotting = true;
             updateTimer.Start();
             elapsed.Restart();
@@ -697,6 +704,10 @@ namespace CerealPotter
 
         private void StopRefresh()
         {
+            if ( _serialPort.IsOpen)
+            {
+                if (systemStatus.values.Serial != "serial0") _serialPort.WriteLine("serial0");
+            }
             isPlotting = false;
             updateTimer.Stop();
             elapsed.Stop();
