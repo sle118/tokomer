@@ -129,8 +129,9 @@ void updateScreenX(void const *arg) {
 		oled.clear();
 		v = (float) (lsumBusMillVolts / lreadings) / 1000;
 		printFloat(0,0,v, 3, false, "v");
+		oled.setCursor(5, 0);
+		oled.putc(global.digitalInputEnable?'D':' ');
 		oled.setCursor(6, 0);
-
 		if(global.power && (global.serial!=SERIAL_OFF)) {
 			oled.putc(pidx % 2?' ':global.serial==SERIAL_TEXT?'^':'*');
 		}

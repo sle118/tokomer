@@ -21,6 +21,7 @@ using System.Security.Permissions;
 using System.Security.Principal;
 using System.Diagnostics;
 using System.Text;
+using static CerealPotter.StatusValues;
 
 namespace CerealPotter
 {
@@ -52,7 +53,8 @@ namespace CerealPotter
         private delegate void UpdateDel(Control lbl, string text);
         private delegate void DisableEnableDel(Control lbl, bool disable);
         private delegate void UpdateGraphDel(CustomGraphControl control);
-        SystemStatus systemStatus;
+        public SystemStatus systemStatus { get; set; }
+        public StatusValues StatusValues { get; set; }
 
         public Form1()
         {
@@ -63,9 +65,23 @@ namespace CerealPotter
             FormClosed += Form1_FormClosed;
             _serialPort = new SerialPort();
             _serialPort.DataReceived += _serialPort_DataReceived;
-            systemStatus = new SystemStatus(Controls, _serialPort);
-            systemStatus.TagUpdated += SetControlTag;
+            
             Controls.FindControlTags(ref ControlList);
+            systemStatus = new SystemStatus(ControlList, _serialPort, this);
+            comboBoxSerial.DataBindings.Add("SelectedValue", systemStatus.values, "Serial", false, DataSourceUpdateMode.OnPropertyChanged);
+            comboBoxScale.DataBindings.Add("SelectedValue", systemStatus.values, "Scale", false, DataSourceUpdateMode.OnPropertyChanged);
+            comboBoxGraph.DataBindings.Add("SelectedValue", systemStatus.values, "Graph", false, DataSourceUpdateMode.OnPropertyChanged);
+            checkBoxPower.DataBindings.Add("Checked", systemStatus.values, "Power", false, DataSourceUpdateMode.OnPropertyChanged);
+            checkBoxDigital.DataBindings.Add("Checked", systemStatus.values, "Digital", false, DataSourceUpdateMode.OnPropertyChanged);
+
+            graphValuesBindingSource.DataSource = systemStatus.values;
+            serialValuesBindingSource.DataSource = systemStatus.values;
+            sensitivityValuesBindingSource.DataSource = systemStatus.values;
+            statusValuesBindingSource.DataSource = systemStatus.values;
+            rangescalesBindingSource.DataSource = systemStatus.values;
+            systemStatus.values.LocalPropertyChanged += HandleValuesChanges;
+            systemStatus.values.PropertyChanged += HandleDeviceStatusChanges; // Add as last to refresh the UI after data changes
+
 
             graphMover.MoveCompleted += MoveCompletedEventHandler;
             CreateGraphControls();
@@ -89,6 +105,39 @@ namespace CerealPotter
             InitializeBackgroundWorker();
             Surrogates.Register();
             Application.DoEvents();
+        }
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+
+            isPlotting = false;
+            storage.thresholdMet = false;
+            updateTimer.Stop();
+            elapsed.Stop();
+            foreach (var ctrl in ControlList)
+            {
+                // got to clear data bindings otherwise closing
+                // the form will result in an exception
+                
+                if(ctrl.Value.DataBindings!=null )
+                {
+                    ctrl.Value.DataBindings.Clear();
+                }
+            }
+
+            Settings.Default.WindowLocation = Location;
+
+            // Copy window size to app settings
+            if (WindowState == FormWindowState.Normal)
+            {
+                Settings.Default.WindowSize = Size;
+            }
+            else
+            {
+                Settings.Default.WindowSize = RestoreBounds.Size;
+            }
+
+            // Save settings
+            Settings.Default.Save();
         }
 
         private void CreateGraphControls()
@@ -368,29 +417,7 @@ namespace CerealPotter
 
 
         }
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            isPlotting = false;
-            storage.thresholdMet = false;
-            updateTimer.Stop();
-            elapsed.Stop();
-
-
-            Settings.Default.WindowLocation = Location;
-
-            // Copy window size to app settings
-            if (WindowState == FormWindowState.Normal)
-            {
-                Settings.Default.WindowSize = Size;
-            }
-            else
-            {
-                Settings.Default.WindowSize = RestoreBounds.Size;
-            }
-
-            // Save settings
-            Settings.Default.Save();
-        }
+       
 
         private void GetSerialPortList()
         {
@@ -772,8 +799,44 @@ namespace CerealPotter
             Reset();
         }
 
+        public void HandleDeviceStatusChanges(object sender, PropertyChangedEventArgs e)
+        {
+            foreach (var item in ControlList)
+            {
+                if (item.Value.DataBindings == null || item.Value.DataBindings.Count == 0) continue;
+                foreach (Binding db in item.Value.DataBindings)
+                {
+                    if (db.BindingMemberInfo.BindingMember == e.PropertyName)
+                    {
+                        item.Value.Invalidate();
+                        return;
 
+                    }
+                }
+            }
 
+        }
+        public void HandleValuesChanges(object sender, PropertyChangedExtendedEventArgs e)
+        {
+            if (e == null || e.IsDeviceUpdate) return;
+            foreach (var item in ControlList)
+            {
+                if (item.Value.DataBindings == null || item.Value.DataBindings.Count==0) continue;
+                foreach (Binding db in item.Value.DataBindings)
+                {
+                    if(db.BindingMemberInfo.BindingMember == e.PropertyName)
+                    {
+                        if(systemStatus.ProcessCommandControl(db.BindableComponent as Control))
+                        {
+                            WaitforResponse();
+                            return;
+                        }
+
+                    }
+                }
+            }
+           
+        }
 
 
         private void couperToolStripButton_Click(object sender, EventArgs e)
@@ -1048,60 +1111,61 @@ namespace CerealPotter
 
         private void handleCheckBoxes_CheckedChanged(object sender, EventArgs e)
         {
-            if (!_serialPort.IsOpen)
-            {
-                MessageBox.Show(this, $"Connect first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-            if (StatusUpdateFromDevice) return;
             WaitforResponse();
-            systemStatus.ProcessCommandControl(sender as Control);
+            if(!systemStatus.ProcessCommandControl(sender as Control))
+            {
+                ResponseReceived();
+            }
         }
 
         private void comboBox1_TextChanged(object sender, EventArgs e)
         {
-            if (StatusUpdateFromDevice) return;
-            systemStatus.ProcessCommandControl(sender as Control);
-        }
-        public delegate void UpdateControl(object sender, SystemStatus.TagUpdateEventArgs args);
-        public void SetControlTag(object sender, SystemStatus.TagUpdateEventArgs args)
-        {
-            if (args.Control.Tag == null) return;
-            int position = args.Control.Tag.ToString().Split(',').ToList().IndexOf(args.Tag);
-            if (position < 0) return;
-            if (args.Control.InvokeRequired)
-            {
-                Invoke(new UpdateControl(SetControlTag), new object[] { sender, args });
-                return;
-            }
-            try
-            {
-                StatusUpdateFromDevice = true;
-                if (args.Control.GetType() == typeof(ComboBox))
-                {
-                    ((ComboBox)args.Control).SelectedIndex = position;
-                    Invalidate();
-                }
-                else if (args.Control.GetType() == typeof(CheckBox))
-                {
-                    ((CheckBox)args.Control).Checked = position > 0;
-                    Invalidate();
-                }
-                else
-                {
-                    return;
-                }
-                StatusUpdateFromDevice = false;
-            }
-            catch (Exception e)
-            {
 
-                Console.WriteLine(e);
-                return;
+            PropertyChangedExtendedEventArgs ext = e as PropertyChangedExtendedEventArgs;
+            if (!systemStatus.ProcessCommandControl(sender as Control))
+            {
+                ResponseReceived();
             }
-
-            return;
         }
+        //public delegate void UpdateControl(object sender, SystemStatus.TagUpdateEventArgs args);
+        //public void SetControlTag(object sender, SystemStatus.TagUpdateEventArgs args)
+        //{
+        //    if (args.Control.Tag == null) return;
+        //    int position = args.Control.Tag.ToString().Split(',').ToList().IndexOf(args.Tag);
+        //    if (position < 0) return;
+        //    if (args.Control.InvokeRequired)
+        //    {
+        //        Invoke(new UpdateControl(SetControlTag), new object[] { sender, args });
+        //        return;
+        //    }
+        //    try
+        //    {
+        //        StatusUpdateFromDevice = true;
+        //        if (args.Control.GetType() == typeof(ComboBox))
+        //        {
+        //            ((ComboBox)args.Control).SelectedIndex = position;
+        //            Invalidate();
+        //        }
+        //        else if (args.Control.GetType() == typeof(CheckBox))
+        //        {
+        //            ((CheckBox)args.Control).Checked = position > 0;
+        //            Invalidate();
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //        StatusUpdateFromDevice = false;
+        //    }
+        //    catch (Exception e)
+        //    {
+
+        //        Console.WriteLine(e);
+        //        return;
+        //    }
+
+        //    return;
+        //}
         private void EnableDisableDelegate(Control ctrl, bool enableDisable)
         {
             ctrl.Enabled = enableDisable;

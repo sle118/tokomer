@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO.Ports;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +12,7 @@ namespace CerealPotter
 
     public class SystemStatus
     {
+
         public class TagUpdateEventArgs
         {
             public Control Control;
@@ -20,29 +22,22 @@ namespace CerealPotter
                 Control = ctrl;
                 Tag = tag;
             }
-
         }
+        public StatusValues values { get; set; } = new StatusValues();
         // Declare the delegate (if using non-generic pattern).
         public delegate void TagUpdateEventHandler(object sender,  TagUpdateEventArgs e);
 
         // Declare the event.
         public event TagUpdateEventHandler TagUpdated;
-        public string graph;
-        public int serial;
-        public bool power;
-        public int scale;
-        public bool binary;
-        public bool overload;
-        public string[] commands;
-        public int[] ranges;
-        public int[][] rangescales;
-        public Control.ControlCollection Controls;
+       
+        public Dictionary<string, Control> ControlsList;
         private SerialPort _serialPort;
 
-        public SystemStatus(Control.ControlCollection controls, SerialPort serialPort)
+        public SystemStatus(Dictionary<string, Control> controlsList, SerialPort serialPort, ISynchronizeInvoke syncInvoke )
         {
-            Controls = controls;
+            ControlsList = controlsList; 
             _serialPort = serialPort;
+            values = new StatusValues(syncInvoke);
         }
 
         public bool ParseSerial(string dataRead)
@@ -53,48 +48,44 @@ namespace CerealPotter
             }
             try
             {
-
-                SystemStatus status = JsonConvert.DeserializeObject<SystemStatus>(dataRead);
-                graph = status.graph;
-                serial = status.serial;
-                power = status.power;
-                scale = status.scale;
-                binary = status.binary;
-                overload = status.overload;
-                commands = status.commands;
-
-
+                values.Update(dataRead);
                 
-                ExtensionMethods.controlList.Clear();
-                foreach (MemberInfo tag in status.GetType().GetMembers().Where(m => m.MemberType == System.Reflection.MemberTypes.Field))
-                {
+                //ExtensionMethods.controlList.Clear();
+                //foreach (MemberInfo tag in values.GetType().GetMembers().Where(m => m.MemberType == MemberTypes.Field))
+                //{
 
-                    Control ctrl = Controls.FindTag(tag.Name);
-                    if (ctrl == null) continue;
-                    if (tag.GetUnderlyingType() == typeof(string))
-                    {
-                        if (status.GetValue(tag, out string fullvalue))
-                        {
-                            TagUpdated?.Invoke(this, new TagUpdateEventArgs(ctrl, tag.Name + fullvalue));
-                        }
-                        //var fullval = tag.Name+status.GetType().GetMember(tag).GetValue()
-                    }
-                    else if (tag.GetUnderlyingType() == typeof(bool))
-                    {
-                        if (status.GetValue(tag, out bool boolvalue))
-                        {
-                            TagUpdated?.Invoke(this, new TagUpdateEventArgs(ctrl, tag.Name + (boolvalue ? "on" : "off")));
-                        }
-                    }
-                    else if (tag.GetUnderlyingType() == typeof(int))
-                    {
-                        if (status.GetValue(tag, out int intValue))
-                        {
-                            TagUpdated?.Invoke(this, new TagUpdateEventArgs(ctrl, tag.Name + intValue.ToString()));
-                        }
-                    }
-                    Console.WriteLine();
-                }
+                //    foreach (var ctrlEntry in ControlsList)
+                //    {
+                //        if(ctrlEntry.Key.StartsWith(tag.Name))
+                //        {
+                //            if (tag.GetUnderlyingType() == typeof(string))
+                //            {
+                //                if (values.GetValue(tag, out string fullvalue))
+                //                {
+                //                    TagUpdated?.Invoke(this, new TagUpdateEventArgs(ctrlEntry.Value, tag.Name + fullvalue));
+                //                }
+                //                //var fullval = tag.Name+status.GetType().GetMember(tag).GetValue()
+                //            }
+                //            else if (tag.GetUnderlyingType() == typeof(bool))
+                //            {
+                //                if (values.GetValue(tag, out bool boolvalue))
+                //                {
+                //                    TagUpdated?.Invoke(this, new TagUpdateEventArgs(ctrlEntry.Value, tag.Name + (boolvalue ? "on" : "off")));
+                //                }
+                //            }
+                //            else if (tag.GetUnderlyingType() == typeof(int))
+                //            {
+                //                if (values.GetValue(tag, out int intValue))
+                //                {
+                //                    TagUpdated?.Invoke(this, new TagUpdateEventArgs(ctrlEntry.Value, tag.Name + intValue.ToString()));
+                //                }
+                //            }
+                //        }
+                //    }
+                    
+                    
+                //    Console.WriteLine();
+                //}
                 return true;
             }
             catch (Exception ex)
@@ -103,8 +94,18 @@ namespace CerealPotter
             }
             return false;
         }
-        public void ProcessCommandControl(Control ctrl)
+        public void StartDataTransfer()
         {
+
+        }
+        public bool ProcessCommandControl(Control ctrl)
+        {
+
+            if (!_serialPort.IsOpen)
+            {
+                MessageBox.Show(null, $"Connect first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return false;
+            }
             string command = "";
             string[] commands = ctrl.Tag.ToString().Split(',');
             if (ctrl.GetType() == typeof(CheckBox))
@@ -113,10 +114,11 @@ namespace CerealPotter
             }
             else if (ctrl.GetType() == typeof(ComboBox))
             {
-                command = commands[(ctrl as ComboBox).SelectedIndex];
+                command = (ctrl as ComboBox).SelectedValue.ToString();
             }
-            if (string.IsNullOrEmpty(command)) return;
+            if (string.IsNullOrEmpty(command)) return false;
             _serialPort.WriteLine(command);
+            return true;
             // todo: disable control inputs until response is recevied
 
         }

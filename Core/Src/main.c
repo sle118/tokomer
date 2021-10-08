@@ -730,7 +730,7 @@ void StartDefaultTask(void const *argument) {
 	for (;;) {
 		osSignalWait(0x1, 10);
 		HAL_ADC_Start(&hadc1);
-//		if(digitalInputEnable!=requestedDigitalInputEnable)
+//		if(global.digitalInputEnable!=requestedDigitalInputEnable)
 //		{
 //			MX_GPIO_Digital_Configure(requestedDigitalInputEnable);
 //		}

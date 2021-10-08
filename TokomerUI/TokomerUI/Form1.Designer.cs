@@ -1,4 +1,7 @@
-﻿namespace CerealPotter
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+
+namespace CerealPotter
 {
     partial class Form1
     {
@@ -29,6 +32,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            CerealPotter.Properties.Settings settings1 = new CerealPotter.Properties.Settings();
+            CerealPotter.Properties.Settings settings2 = new CerealPotter.Properties.Settings();
+            CerealPotter.Properties.Settings settings3 = new CerealPotter.Properties.Settings();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.chkShowDataRead = new System.Windows.Forms.CheckBox();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
@@ -43,14 +49,20 @@
             this.textBoxReceive = new System.Windows.Forms.TextBox();
             this.tableLayoutPanelStates = new System.Windows.Forms.TableLayoutPanel();
             this.checkBoxPower = new System.Windows.Forms.CheckBox();
-            this.checkBoxBinary = new System.Windows.Forms.CheckBox();
             this.checkBoxDigital = new System.Windows.Forms.CheckBox();
             this.panelScaleCombo = new System.Windows.Forms.Panel();
             this.comboBoxScale = new System.Windows.Forms.ComboBox();
+            this.sensitivityValuesBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.statusValuesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label6 = new System.Windows.Forms.Label();
             this.panelGraphCombo = new System.Windows.Forms.Panel();
             this.label7 = new System.Windows.Forms.Label();
             this.comboBoxGraph = new System.Windows.Forms.ComboBox();
+            this.graphValuesBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBoxSerial = new System.Windows.Forms.ComboBox();
+            this.serialValuesBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.label8 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -90,9 +102,7 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.circularProgressBar1 = new CircularProgressBar.CircularProgressBar();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.comboBoxSerial = new System.Windows.Forms.ComboBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.rangescalesBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -102,7 +112,12 @@
             this.flowLayoutPanelMainControls.SuspendLayout();
             this.tableLayoutPanelStates.SuspendLayout();
             this.panelScaleCombo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sensitivityValuesBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.statusValuesBindingSource)).BeginInit();
             this.panelGraphCombo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.graphValuesBindingSource)).BeginInit();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.serialValuesBindingSource)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -119,7 +134,7 @@
             this.tableGraphPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rangescalesBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // chkShowDataRead
@@ -160,7 +175,7 @@
             this.zedGraphControl1.ScrollMinX = 0D;
             this.zedGraphControl1.ScrollMinY = 0D;
             this.zedGraphControl1.ScrollMinY2 = 0D;
-            this.zedGraphControl1.Size = new System.Drawing.Size(1508, 496);
+            this.zedGraphControl1.Size = new System.Drawing.Size(1508, 492);
             this.zedGraphControl1.TabIndex = 0;
             this.zedGraphControl1.UseExtendedPrintDialog = true;
             this.zedGraphControl1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.zedGraphControl1_KeyPress);
@@ -282,7 +297,6 @@
             this.tableLayoutPanelStates.ColumnCount = 1;
             this.tableLayoutPanelStates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanelStates.Controls.Add(this.checkBoxPower, 0, 1);
-            this.tableLayoutPanelStates.Controls.Add(this.checkBoxBinary, 0, 2);
             this.tableLayoutPanelStates.Controls.Add(this.checkBoxDigital, 0, 3);
             this.tableLayoutPanelStates.Controls.Add(this.panelScaleCombo, 0, 4);
             this.tableLayoutPanelStates.Controls.Add(this.panelGraphCombo, 0, 5);
@@ -291,14 +305,13 @@
             this.tableLayoutPanelStates.Location = new System.Drawing.Point(3, 133);
             this.tableLayoutPanelStates.Name = "tableLayoutPanelStates";
             this.tableLayoutPanelStates.RowCount = 6;
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanelStates.Size = new System.Drawing.Size(296, 366);
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelStates.Size = new System.Drawing.Size(296, 177);
             this.tableLayoutPanelStates.TabIndex = 17;
             // 
             // checkBoxPower
@@ -306,68 +319,59 @@
             this.checkBoxPower.AutoSize = true;
             this.checkBoxPower.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBoxPower.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxPower.Location = new System.Drawing.Point(3, 63);
+            this.checkBoxPower.Location = new System.Drawing.Point(3, 43);
             this.checkBoxPower.Name = "checkBoxPower";
-            this.checkBoxPower.Size = new System.Drawing.Size(290, 54);
+            this.checkBoxPower.Size = new System.Drawing.Size(290, 24);
             this.checkBoxPower.TabIndex = 10;
             this.checkBoxPower.Tag = "poweroff,poweron";
             this.checkBoxPower.Text = "Power Enable";
             this.checkBoxPower.UseVisualStyleBackColor = true;
-            this.checkBoxPower.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
-            // 
-            // checkBoxBinary
-            // 
-            this.checkBoxBinary.AutoSize = true;
-            this.checkBoxBinary.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.checkBoxBinary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxBinary.Location = new System.Drawing.Point(3, 123);
-            this.checkBoxBinary.Name = "checkBoxBinary";
-            this.checkBoxBinary.Size = new System.Drawing.Size(290, 54);
-            this.checkBoxBinary.TabIndex = 16;
-            this.checkBoxBinary.Tag = "binaryoff,binaryon";
-            this.checkBoxBinary.Text = "Binary Data Transfer";
-            this.checkBoxBinary.UseVisualStyleBackColor = true;
-            this.checkBoxBinary.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
             // 
             // checkBoxDigital
             // 
             this.checkBoxDigital.AutoSize = true;
             this.checkBoxDigital.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBoxDigital.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBoxDigital.Location = new System.Drawing.Point(3, 183);
+            this.checkBoxDigital.Location = new System.Drawing.Point(3, 73);
             this.checkBoxDigital.Name = "checkBoxDigital";
-            this.checkBoxDigital.Size = new System.Drawing.Size(290, 54);
+            this.checkBoxDigital.Size = new System.Drawing.Size(290, 24);
             this.checkBoxDigital.TabIndex = 13;
             this.checkBoxDigital.Tag = "digitaloff,digitalon";
             this.checkBoxDigital.Text = "Digital Input Enable";
             this.checkBoxDigital.UseVisualStyleBackColor = true;
-            this.checkBoxDigital.CheckedChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
             // 
             // panelScaleCombo
             // 
+            this.panelScaleCombo.AutoSize = true;
+            this.panelScaleCombo.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panelScaleCombo.Controls.Add(this.comboBoxScale);
             this.panelScaleCombo.Controls.Add(this.label6);
             this.panelScaleCombo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelScaleCombo.Location = new System.Drawing.Point(3, 243);
+            this.panelScaleCombo.Location = new System.Drawing.Point(3, 103);
             this.panelScaleCombo.Name = "panelScaleCombo";
-            this.panelScaleCombo.Size = new System.Drawing.Size(290, 54);
+            this.panelScaleCombo.Size = new System.Drawing.Size(290, 34);
             this.panelScaleCombo.TabIndex = 18;
             // 
             // comboBoxScale
             // 
+            this.comboBoxScale.DataSource = this.sensitivityValuesBindingSource;
+            this.comboBoxScale.DisplayMember = "Value";
             this.comboBoxScale.FormattingEnabled = true;
-            this.comboBoxScale.Items.AddRange(new object[] {
-            "High Precision",
-            "Medium Precision",
-            "Low Precision",
-            "Lowest Precision"});
             this.comboBoxScale.Location = new System.Drawing.Point(166, 3);
             this.comboBoxScale.Name = "comboBoxScale";
             this.comboBoxScale.Size = new System.Drawing.Size(121, 28);
             this.comboBoxScale.TabIndex = 12;
             this.comboBoxScale.Tag = "scale0,scale1,scale2,scale3";
-            this.comboBoxScale.SelectionChangeCommitted += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
-            this.comboBoxScale.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
+            this.comboBoxScale.ValueMember = "Key";
+            // 
+            // sensitivityValuesBindingSource
+            // 
+            this.sensitivityValuesBindingSource.DataMember = "SensitivityValues";
+            this.sensitivityValuesBindingSource.DataSource = this.statusValuesBindingSource;
+            // 
+            // statusValuesBindingSource
+            // 
+            this.statusValuesBindingSource.DataSource = typeof(CerealPotter.StatusValues);
             // 
             // label6
             // 
@@ -380,12 +384,14 @@
             // 
             // panelGraphCombo
             // 
+            this.panelGraphCombo.AutoSize = true;
+            this.panelGraphCombo.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panelGraphCombo.Controls.Add(this.label7);
             this.panelGraphCombo.Controls.Add(this.comboBoxGraph);
             this.panelGraphCombo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelGraphCombo.Location = new System.Drawing.Point(3, 303);
+            this.panelGraphCombo.Location = new System.Drawing.Point(3, 143);
             this.panelGraphCombo.Name = "panelGraphCombo";
-            this.panelGraphCombo.Size = new System.Drawing.Size(290, 60);
+            this.panelGraphCombo.Size = new System.Drawing.Size(290, 31);
             this.panelGraphCombo.TabIndex = 18;
             // 
             // label7
@@ -399,17 +405,58 @@
             // 
             // comboBoxGraph
             // 
+            this.comboBoxGraph.DataSource = this.graphValuesBindingSource;
+            this.comboBoxGraph.DisplayMember = "Value";
             this.comboBoxGraph.FormattingEnabled = true;
-            this.comboBoxGraph.Items.AddRange(new object[] {
-            "Current",
-            "Voltage"});
             this.comboBoxGraph.Location = new System.Drawing.Point(166, 0);
             this.comboBoxGraph.Name = "comboBoxGraph";
             this.comboBoxGraph.Size = new System.Drawing.Size(121, 28);
             this.comboBoxGraph.TabIndex = 15;
             this.comboBoxGraph.Tag = "graphvolt,graphcurr";
-            this.comboBoxGraph.SelectedIndexChanged += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
-            this.comboBoxGraph.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
+            this.comboBoxGraph.ValueMember = "Key";
+            // 
+            // graphValuesBindingSource
+            // 
+            this.graphValuesBindingSource.DataMember = "GraphValues";
+            this.graphValuesBindingSource.DataSource = this.statusValuesBindingSource;
+            // 
+            // panel1
+            // 
+            this.panel1.AutoSize = true;
+            this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panel1.Controls.Add(this.comboBoxSerial);
+            this.panel1.Controls.Add(this.label8);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(290, 34);
+            this.panel1.TabIndex = 19;
+            // 
+            // comboBoxSerial
+            // 
+            this.comboBoxSerial.DataSource = this.serialValuesBindingSource;
+            this.comboBoxSerial.DisplayMember = "Value";
+            this.comboBoxSerial.FormattingEnabled = true;
+            this.comboBoxSerial.Location = new System.Drawing.Point(166, 3);
+            this.comboBoxSerial.Name = "comboBoxSerial";
+            this.comboBoxSerial.Size = new System.Drawing.Size(121, 28);
+            this.comboBoxSerial.TabIndex = 12;
+            this.comboBoxSerial.Tag = "serial0,serial1,serial2";
+            this.comboBoxSerial.ValueMember = "Key";
+            // 
+            // serialValuesBindingSource
+            // 
+            this.serialValuesBindingSource.DataMember = "SerialValues";
+            this.serialValuesBindingSource.DataSource = this.statusValuesBindingSource;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(3, 6);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(93, 20);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "Serial Mode";
             // 
             // tabPage2
             // 
@@ -475,7 +522,68 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numericUpDown1.AutoSize = true;
-            this.numericUpDown1.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "Threshold_mA", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            settings1.BufferLenSeconds = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            settings1.curve_multipliers = "0.001,0.01";
+            settings1.curve_names = "mA,V";
+            settings1.curves_titles = "Current,Voltage";
+            settings1.DataFileInitialDirectory = "";
+            settings1.PeakDetectionLag_ms = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            settings1.PeakDetectionSignalInfluence = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            settings1.PeakDetectionThreshold = new decimal(new int[] {
+            35,
+            0,
+            0,
+            65536});
+            settings1.Precision = "";
+            settings1.PreThreshold_ms = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            settings1.ReadsPerSec = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
+            settings1.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
+            settings1.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
+            settings1.serial_port = "COM5";
+            settings1.SettingsKey = "";
+            settings1.Threshold_mA = new decimal(new int[] {
+            15,
+            0,
+            0,
+            65536});
+            settings1.TriggerAvgWindowMs = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            settings1.TriggerDelta_mA = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            settings1.TrigThresholdPct = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            settings1.WindowLocation = new System.Drawing.Point(245, 258);
+            settings1.WindowSize = new System.Drawing.Size(1463, 803);
+            this.numericUpDown1.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "Threshold_mA", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numericUpDown1.Increment = new decimal(new int[] {
             1,
             0,
@@ -495,7 +603,7 @@
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(133, 26);
             this.numericUpDown1.TabIndex = 28;
-            this.numericUpDown1.Value = global::CerealPotter.Properties.Settings.Default.Threshold_mA;
+            this.numericUpDown1.Value = settings1.Threshold_mA;
             // 
             // label5
             // 
@@ -514,7 +622,68 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numBufferLength.AutoSize = true;
-            this.numBufferLength.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "BufferLenSeconds", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            settings2.BufferLenSeconds = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            settings2.curve_multipliers = "0.001,0.01";
+            settings2.curve_names = "mA,V";
+            settings2.curves_titles = "Current,Voltage";
+            settings2.DataFileInitialDirectory = "";
+            settings2.PeakDetectionLag_ms = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            settings2.PeakDetectionSignalInfluence = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            settings2.PeakDetectionThreshold = new decimal(new int[] {
+            35,
+            0,
+            0,
+            65536});
+            settings2.Precision = "";
+            settings2.PreThreshold_ms = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            settings2.ReadsPerSec = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
+            settings2.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
+            settings2.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
+            settings2.serial_port = "COM5";
+            settings2.SettingsKey = "";
+            settings2.Threshold_mA = new decimal(new int[] {
+            15,
+            0,
+            0,
+            65536});
+            settings2.TriggerAvgWindowMs = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            settings2.TriggerDelta_mA = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            settings2.TrigThresholdPct = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            settings2.WindowLocation = new System.Drawing.Point(245, 258);
+            settings2.WindowSize = new System.Drawing.Size(1463, 803);
+            this.numBufferLength.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings2, "BufferLenSeconds", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numBufferLength.Location = new System.Drawing.Point(212, 35);
             this.numBufferLength.Maximum = new decimal(new int[] {
             600,
@@ -529,7 +698,7 @@
             this.numBufferLength.Name = "numBufferLength";
             this.numBufferLength.Size = new System.Drawing.Size(133, 26);
             this.numBufferLength.TabIndex = 26;
-            this.numBufferLength.Value = global::CerealPotter.Properties.Settings.Default.BufferLenSeconds;
+            this.numBufferLength.Value = settings2.BufferLenSeconds;
             // 
             // label4
             // 
@@ -548,7 +717,68 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numReadsPerSec.AutoSize = true;
-            this.numReadsPerSec.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "ReadsPerSec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            settings3.BufferLenSeconds = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            settings3.curve_multipliers = "0.001,0.01";
+            settings3.curve_names = "mA,V";
+            settings3.curves_titles = "Current,Voltage";
+            settings3.DataFileInitialDirectory = "";
+            settings3.PeakDetectionLag_ms = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            settings3.PeakDetectionSignalInfluence = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            settings3.PeakDetectionThreshold = new decimal(new int[] {
+            35,
+            0,
+            0,
+            65536});
+            settings3.Precision = "";
+            settings3.PreThreshold_ms = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            settings3.ReadsPerSec = new decimal(new int[] {
+            5000,
+            0,
+            0,
+            0});
+            settings3.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
+            settings3.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
+            settings3.serial_port = "COM5";
+            settings3.SettingsKey = "";
+            settings3.Threshold_mA = new decimal(new int[] {
+            15,
+            0,
+            0,
+            65536});
+            settings3.TriggerAvgWindowMs = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            settings3.TriggerDelta_mA = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            settings3.TrigThresholdPct = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            settings3.WindowLocation = new System.Drawing.Point(245, 258);
+            settings3.WindowSize = new System.Drawing.Size(1463, 803);
+            this.numReadsPerSec.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings3, "ReadsPerSec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numReadsPerSec.Increment = new decimal(new int[] {
             100,
             0,
@@ -568,7 +798,7 @@
             this.numReadsPerSec.Name = "numReadsPerSec";
             this.numReadsPerSec.Size = new System.Drawing.Size(133, 26);
             this.numReadsPerSec.TabIndex = 24;
-            this.numReadsPerSec.Value = global::CerealPotter.Properties.Settings.Default.ReadsPerSec;
+            this.numReadsPerSec.Value = settings3.ReadsPerSec;
             // 
             // label3
             // 
@@ -587,7 +817,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numPreThreshold.AutoSize = true;
-            this.numPreThreshold.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "PreThreshold_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numPreThreshold.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PreThreshold_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numPreThreshold.Increment = new decimal(new int[] {
             1,
             0,
@@ -607,7 +837,7 @@
             this.numPreThreshold.Name = "numPreThreshold";
             this.numPreThreshold.Size = new System.Drawing.Size(133, 26);
             this.numPreThreshold.TabIndex = 30;
-            this.numPreThreshold.Value = global::CerealPotter.Properties.Settings.Default.PreThreshold_ms;
+            this.numPreThreshold.Value = settings1.PreThreshold_ms;
             // 
             // label9
             // 
@@ -626,7 +856,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numTriggerLag_ms.AutoSize = true;
-            this.numTriggerLag_ms.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "PeakDetectionLag_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numTriggerLag_ms.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PeakDetectionLag_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numTriggerLag_ms.Location = new System.Drawing.Point(212, 131);
             this.numTriggerLag_ms.Maximum = new decimal(new int[] {
             10000,
@@ -641,7 +871,7 @@
             this.numTriggerLag_ms.Name = "numTriggerLag_ms";
             this.numTriggerLag_ms.Size = new System.Drawing.Size(133, 26);
             this.numTriggerLag_ms.TabIndex = 32;
-            this.numTriggerLag_ms.Value = global::CerealPotter.Properties.Settings.Default.PeakDetectionLag_ms;
+            this.numTriggerLag_ms.Value = settings1.PeakDetectionLag_ms;
             // 
             // label10
             // 
@@ -660,7 +890,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numTriggerAvgWindowMs.AutoSize = true;
-            this.numTriggerAvgWindowMs.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "PeakDetectionSignalInfluence", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numTriggerAvgWindowMs.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PeakDetectionSignalInfluence", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numTriggerAvgWindowMs.DecimalPlaces = 2;
             this.numTriggerAvgWindowMs.Increment = new decimal(new int[] {
             1,
@@ -676,7 +906,7 @@
             this.numTriggerAvgWindowMs.Name = "numTriggerAvgWindowMs";
             this.numTriggerAvgWindowMs.Size = new System.Drawing.Size(133, 26);
             this.numTriggerAvgWindowMs.TabIndex = 34;
-            this.numTriggerAvgWindowMs.Value = global::CerealPotter.Properties.Settings.Default.PeakDetectionSignalInfluence;
+            this.numTriggerAvgWindowMs.Value = settings1.PeakDetectionSignalInfluence;
             // 
             // label11
             // 
@@ -695,7 +925,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numTriggerDeltamA.AutoSize = true;
-            this.numTriggerDeltamA.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::CerealPotter.Properties.Settings.Default, "PeakDetectionThreshold", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numTriggerDeltamA.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PeakDetectionThreshold", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numTriggerDeltamA.DecimalPlaces = 2;
             this.numTriggerDeltamA.Increment = new decimal(new int[] {
             1,
@@ -711,7 +941,7 @@
             this.numTriggerDeltamA.Name = "numTriggerDeltamA";
             this.numTriggerDeltamA.Size = new System.Drawing.Size(133, 26);
             this.numTriggerDeltamA.TabIndex = 36;
-            this.numTriggerDeltamA.Value = global::CerealPotter.Properties.Settings.Default.PeakDetectionThreshold;
+            this.numTriggerDeltamA.Value = settings1.PeakDetectionThreshold;
             // 
             // checkBoxLogAxis
             // 
@@ -742,7 +972,7 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.flowLayoutPanel1);
             this.splitContainer2.Size = new System.Drawing.Size(1516, 656);
-            this.splitContainer2.SplitterDistance = 504;
+            this.splitContainer2.SplitterDistance = 500;
             this.splitContainer2.TabIndex = 0;
             // 
             // tableGraphPanel
@@ -758,7 +988,7 @@
             this.tableGraphPanel.Name = "tableGraphPanel";
             this.tableGraphPanel.RowCount = 1;
             this.tableGraphPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableGraphPanel.Size = new System.Drawing.Size(1514, 502);
+            this.tableGraphPanel.Size = new System.Drawing.Size(1514, 498);
             this.tableGraphPanel.TabIndex = 0;
             // 
             // flowLayoutPanel1
@@ -766,7 +996,7 @@
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(1514, 146);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(1514, 150);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
             // statusStrip1
@@ -958,42 +1188,12 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.InitialDirectory = global::CerealPotter.Properties.Settings.Default.DataFileInitialDirectory;
+            this.openFileDialog1.InitialDirectory = settings1.DataFileInitialDirectory;
             // 
-            // panel1
+            // rangescalesBindingSource
             // 
-            this.panel1.AutoSize = true;
-            this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.panel1.Controls.Add(this.comboBoxSerial);
-            this.panel1.Controls.Add(this.label8);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(290, 54);
-            this.panel1.TabIndex = 19;
-            // 
-            // comboBoxSerial
-            // 
-            this.comboBoxSerial.FormattingEnabled = true;
-            this.comboBoxSerial.Items.AddRange(new object[] {
-            "Serial Off",
-            "Serial Text",
-            "Serial Binary"});
-            this.comboBoxSerial.Location = new System.Drawing.Point(166, 3);
-            this.comboBoxSerial.Name = "comboBoxSerial";
-            this.comboBoxSerial.Size = new System.Drawing.Size(121, 28);
-            this.comboBoxSerial.TabIndex = 12;
-            this.comboBoxSerial.Tag = "serial0,serial1,serial2";
-            this.comboBoxSerial.SelectionChangeCommitted += new System.EventHandler(this.handleCheckBoxes_CheckedChanged);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 6);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(93, 20);
-            this.label8.TabIndex = 14;
-            this.label8.Text = "Serial Mode";
+            this.rangescalesBindingSource.DataMember = "Rangescales";
+            this.rangescalesBindingSource.DataSource = this.statusValuesBindingSource;
             // 
             // Form1
             // 
@@ -1020,8 +1220,14 @@
             this.tableLayoutPanelStates.PerformLayout();
             this.panelScaleCombo.ResumeLayout(false);
             this.panelScaleCombo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sensitivityValuesBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.statusValuesBindingSource)).EndInit();
             this.panelGraphCombo.ResumeLayout(false);
             this.panelGraphCombo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.graphValuesBindingSource)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.serialValuesBindingSource)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -1044,8 +1250,7 @@
             this.statusStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rangescalesBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1105,7 +1310,6 @@
         public System.Windows.Forms.CheckBox checkBoxPower;
         public System.Windows.Forms.ComboBox comboBoxScale;
         public System.Windows.Forms.CheckBox checkBoxDigital;
-        public System.Windows.Forms.CheckBox checkBoxBinary;
         private System.Windows.Forms.Panel panelScaleCombo;
         private System.Windows.Forms.Panel panelGraphCombo;
         private System.Windows.Forms.Label label7;
@@ -1115,6 +1319,11 @@
         private System.Windows.Forms.Panel panel1;
         public System.Windows.Forms.ComboBox comboBoxSerial;
         private System.Windows.Forms.Label label8;
+        public System.Windows.Forms.BindingSource statusValuesBindingSource;
+        private System.Windows.Forms.BindingSource sensitivityValuesBindingSource;
+        private System.Windows.Forms.BindingSource graphValuesBindingSource;
+        private System.Windows.Forms.BindingSource serialValuesBindingSource;
+        private System.Windows.Forms.BindingSource rangescalesBindingSource;
     }
 }
 

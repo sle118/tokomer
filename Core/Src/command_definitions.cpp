@@ -204,6 +204,7 @@ void addVar(const char *name) {
 void addStringVar(const char *name, const char *value, bool last) {
 	addVar(name);
 	strncat_flush(quote);
+	strncat_flush(name);
 	strncat_flush(value);
 	strncat_flush(quote);
 	if (!last)
@@ -222,6 +223,15 @@ void addIntVar(const char *name, int value, bool last) {
 	if (!last)
 		strncat_flush(comma);
 }
+void addComboVar(const char *name, int value, bool last) {
+	addVar(name);
+	strncat_flush(quote);
+	strncat_flush(name);
+	strncat_flush(bufferedNumber(value));
+	strncat_flush(quote);
+	if (!last)
+		strncat_flush(comma);
+}
 void reportStatus() {
 	uint8_t cmd_index = 0;
 	serial_state_t savestate=global.serial;
@@ -230,9 +240,9 @@ void reportStatus() {
 	dataTransferHold = true;
 	strncat_flush(curly_open);
 	addStringVar("graph", !global.graphModeCurrent ? "volt" : "curr", false);
-	addIntVar("serial", savestate, false);
+	addComboVar("serial", savestate, false);
 	addBoolVar("power", global.power, false);
-	addIntVar("scale", global.rangeScale, false);
+	addComboVar("scale", global.rangeScale, false);
 	addBoolVar("digital", global.digitalInputEnable, false);
 	addBoolVar("overload", global.overload, false);
 	addVar("rangescales");
