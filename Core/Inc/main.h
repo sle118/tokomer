@@ -117,7 +117,7 @@ void Error_Handler(void);
 #define KEY3_Pin GPIO_PIN_9
 #define KEY3_GPIO_Port GPIOB
 
-#define SCREEN_TASK_STACK 200
+#define SCREEN_TASK_STACK 215
 #define RX_TASK_STACK 75
 #define NUMBER_OF_RANGES 4
 #define NUMBER_OF_RANGE_SCALES 4

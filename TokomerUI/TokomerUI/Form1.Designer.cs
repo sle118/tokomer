@@ -32,9 +32,9 @@ namespace CerealPotter
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            CerealPotter.Properties.Settings settings1 = new CerealPotter.Properties.Settings();
-            CerealPotter.Properties.Settings settings2 = new CerealPotter.Properties.Settings();
-            CerealPotter.Properties.Settings settings3 = new CerealPotter.Properties.Settings();
+            CerealPotter.Properties.Settings settings4 = new CerealPotter.Properties.Settings();
+            CerealPotter.Properties.Settings settings5 = new CerealPotter.Properties.Settings();
+            CerealPotter.Properties.Settings settings6 = new CerealPotter.Properties.Settings();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.chkShowDataRead = new System.Windows.Forms.CheckBox();
             this.zedGraphControl1 = new ZedGraph.ZedGraphControl();
@@ -103,6 +103,9 @@ namespace CerealPotter
             this.circularProgressBar1 = new CircularProgressBar.CircularProgressBar();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.rangescalesBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.label12 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.labelElementsPerSec = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -135,6 +138,7 @@ namespace CerealPotter
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.rangescalesBindingSource)).BeginInit();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkShowDataRead
@@ -296,6 +300,7 @@ namespace CerealPotter
             this.tableLayoutPanelStates.AutoSize = true;
             this.tableLayoutPanelStates.ColumnCount = 1;
             this.tableLayoutPanelStates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanelStates.Controls.Add(this.panel2, 0, 6);
             this.tableLayoutPanelStates.Controls.Add(this.checkBoxPower, 0, 1);
             this.tableLayoutPanelStates.Controls.Add(this.checkBoxDigital, 0, 3);
             this.tableLayoutPanelStates.Controls.Add(this.panelScaleCombo, 0, 4);
@@ -304,14 +309,16 @@ namespace CerealPotter
             this.tableLayoutPanelStates.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanelStates.Location = new System.Drawing.Point(3, 133);
             this.tableLayoutPanelStates.Name = "tableLayoutPanelStates";
-            this.tableLayoutPanelStates.RowCount = 6;
+            this.tableLayoutPanelStates.RowCount = 7;
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanelStates.Size = new System.Drawing.Size(296, 177);
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelStates.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelStates.Size = new System.Drawing.Size(296, 197);
             this.tableLayoutPanelStates.TabIndex = 17;
             // 
             // checkBoxPower
@@ -522,68 +529,68 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numericUpDown1.AutoSize = true;
-            settings1.BufferLenSeconds = new decimal(new int[] {
+            settings4.BufferLenSeconds = new decimal(new int[] {
             100,
             0,
             0,
             0});
-            settings1.curve_multipliers = "0.001,0.01";
-            settings1.curve_names = "mA,V";
-            settings1.curves_titles = "Current,Voltage";
-            settings1.DataFileInitialDirectory = "";
-            settings1.PeakDetectionLag_ms = new decimal(new int[] {
+            settings4.curve_multipliers = "0.001,0.01";
+            settings4.curve_names = "mA,V";
+            settings4.curves_titles = "Current,Voltage";
+            settings4.DataFileInitialDirectory = "";
+            settings4.PeakDetectionLag_ms = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            settings1.PeakDetectionSignalInfluence = new decimal(new int[] {
+            settings4.PeakDetectionSignalInfluence = new decimal(new int[] {
             5,
             0,
             0,
             65536});
-            settings1.PeakDetectionThreshold = new decimal(new int[] {
+            settings4.PeakDetectionThreshold = new decimal(new int[] {
             35,
             0,
             0,
             65536});
-            settings1.Precision = "";
-            settings1.PreThreshold_ms = new decimal(new int[] {
+            settings4.Precision = "";
+            settings4.PreThreshold_ms = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            settings1.ReadsPerSec = new decimal(new int[] {
+            settings4.ReadsPerSec = new decimal(new int[] {
             5000,
             0,
             0,
             0});
-            settings1.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
-            settings1.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
-            settings1.serial_port = "COM5";
-            settings1.SettingsKey = "";
-            settings1.Threshold_mA = new decimal(new int[] {
+            settings4.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
+            settings4.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
+            settings4.serial_port = "COM5";
+            settings4.SettingsKey = "";
+            settings4.Threshold_mA = new decimal(new int[] {
             15,
             0,
             0,
             65536});
-            settings1.TriggerAvgWindowMs = new decimal(new int[] {
+            settings4.TriggerAvgWindowMs = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            settings1.TriggerDelta_mA = new decimal(new int[] {
+            settings4.TriggerDelta_mA = new decimal(new int[] {
             10,
             0,
             0,
             0});
-            settings1.TrigThresholdPct = new decimal(new int[] {
+            settings4.TrigThresholdPct = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            settings1.WindowLocation = new System.Drawing.Point(245, 258);
-            settings1.WindowSize = new System.Drawing.Size(1463, 803);
-            this.numericUpDown1.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "Threshold_mA", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            settings4.WindowLocation = new System.Drawing.Point(245, 258);
+            settings4.WindowSize = new System.Drawing.Size(1463, 803);
+            this.numericUpDown1.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings4, "Threshold_mA", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numericUpDown1.Increment = new decimal(new int[] {
             1,
             0,
@@ -603,7 +610,7 @@ namespace CerealPotter
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(133, 26);
             this.numericUpDown1.TabIndex = 28;
-            this.numericUpDown1.Value = settings1.Threshold_mA;
+            this.numericUpDown1.Value = settings4.Threshold_mA;
             // 
             // label5
             // 
@@ -622,68 +629,68 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numBufferLength.AutoSize = true;
-            settings2.BufferLenSeconds = new decimal(new int[] {
+            settings5.BufferLenSeconds = new decimal(new int[] {
             100,
             0,
             0,
             0});
-            settings2.curve_multipliers = "0.001,0.01";
-            settings2.curve_names = "mA,V";
-            settings2.curves_titles = "Current,Voltage";
-            settings2.DataFileInitialDirectory = "";
-            settings2.PeakDetectionLag_ms = new decimal(new int[] {
+            settings5.curve_multipliers = "0.001,0.01";
+            settings5.curve_names = "mA,V";
+            settings5.curves_titles = "Current,Voltage";
+            settings5.DataFileInitialDirectory = "";
+            settings5.PeakDetectionLag_ms = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            settings2.PeakDetectionSignalInfluence = new decimal(new int[] {
+            settings5.PeakDetectionSignalInfluence = new decimal(new int[] {
             5,
             0,
             0,
             65536});
-            settings2.PeakDetectionThreshold = new decimal(new int[] {
+            settings5.PeakDetectionThreshold = new decimal(new int[] {
             35,
             0,
             0,
             65536});
-            settings2.Precision = "";
-            settings2.PreThreshold_ms = new decimal(new int[] {
+            settings5.Precision = "";
+            settings5.PreThreshold_ms = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            settings2.ReadsPerSec = new decimal(new int[] {
+            settings5.ReadsPerSec = new decimal(new int[] {
             5000,
             0,
             0,
             0});
-            settings2.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
-            settings2.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
-            settings2.serial_port = "COM5";
-            settings2.SettingsKey = "";
-            settings2.Threshold_mA = new decimal(new int[] {
+            settings5.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
+            settings5.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
+            settings5.serial_port = "COM5";
+            settings5.SettingsKey = "";
+            settings5.Threshold_mA = new decimal(new int[] {
             15,
             0,
             0,
             65536});
-            settings2.TriggerAvgWindowMs = new decimal(new int[] {
+            settings5.TriggerAvgWindowMs = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            settings2.TriggerDelta_mA = new decimal(new int[] {
+            settings5.TriggerDelta_mA = new decimal(new int[] {
             10,
             0,
             0,
             0});
-            settings2.TrigThresholdPct = new decimal(new int[] {
+            settings5.TrigThresholdPct = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            settings2.WindowLocation = new System.Drawing.Point(245, 258);
-            settings2.WindowSize = new System.Drawing.Size(1463, 803);
-            this.numBufferLength.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings2, "BufferLenSeconds", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            settings5.WindowLocation = new System.Drawing.Point(245, 258);
+            settings5.WindowSize = new System.Drawing.Size(1463, 803);
+            this.numBufferLength.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings5, "BufferLenSeconds", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numBufferLength.Location = new System.Drawing.Point(212, 35);
             this.numBufferLength.Maximum = new decimal(new int[] {
             600,
@@ -698,7 +705,7 @@ namespace CerealPotter
             this.numBufferLength.Name = "numBufferLength";
             this.numBufferLength.Size = new System.Drawing.Size(133, 26);
             this.numBufferLength.TabIndex = 26;
-            this.numBufferLength.Value = settings2.BufferLenSeconds;
+            this.numBufferLength.Value = settings5.BufferLenSeconds;
             // 
             // label4
             // 
@@ -717,68 +724,68 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numReadsPerSec.AutoSize = true;
-            settings3.BufferLenSeconds = new decimal(new int[] {
+            settings6.BufferLenSeconds = new decimal(new int[] {
             100,
             0,
             0,
             0});
-            settings3.curve_multipliers = "0.001,0.01";
-            settings3.curve_names = "mA,V";
-            settings3.curves_titles = "Current,Voltage";
-            settings3.DataFileInitialDirectory = "";
-            settings3.PeakDetectionLag_ms = new decimal(new int[] {
+            settings6.curve_multipliers = "0.001,0.01";
+            settings6.curve_names = "mA,V";
+            settings6.curves_titles = "Current,Voltage";
+            settings6.DataFileInitialDirectory = "";
+            settings6.PeakDetectionLag_ms = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            settings3.PeakDetectionSignalInfluence = new decimal(new int[] {
+            settings6.PeakDetectionSignalInfluence = new decimal(new int[] {
             5,
             0,
             0,
             65536});
-            settings3.PeakDetectionThreshold = new decimal(new int[] {
+            settings6.PeakDetectionThreshold = new decimal(new int[] {
             35,
             0,
             0,
             65536});
-            settings3.Precision = "";
-            settings3.PreThreshold_ms = new decimal(new int[] {
+            settings6.Precision = "";
+            settings6.PreThreshold_ms = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            settings3.ReadsPerSec = new decimal(new int[] {
+            settings6.ReadsPerSec = new decimal(new int[] {
             5000,
             0,
             0,
             0});
-            settings3.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
-            settings3.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
-            settings3.serial_port = "COM5";
-            settings3.SettingsKey = "";
-            settings3.Threshold_mA = new decimal(new int[] {
+            settings6.regex_pattern = "(\\w+),(\\d+(\\.\\d+)?)";
+            settings6.regex_pattern_noname = "(\\d+([\\.]\\d+)?)[,](\\d+([\\.]\\d+)?)";
+            settings6.serial_port = "COM5";
+            settings6.SettingsKey = "";
+            settings6.Threshold_mA = new decimal(new int[] {
             15,
             0,
             0,
             65536});
-            settings3.TriggerAvgWindowMs = new decimal(new int[] {
+            settings6.TriggerAvgWindowMs = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            settings3.TriggerDelta_mA = new decimal(new int[] {
+            settings6.TriggerDelta_mA = new decimal(new int[] {
             10,
             0,
             0,
             0});
-            settings3.TrigThresholdPct = new decimal(new int[] {
+            settings6.TrigThresholdPct = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            settings3.WindowLocation = new System.Drawing.Point(245, 258);
-            settings3.WindowSize = new System.Drawing.Size(1463, 803);
-            this.numReadsPerSec.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings3, "ReadsPerSec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            settings6.WindowLocation = new System.Drawing.Point(245, 258);
+            settings6.WindowSize = new System.Drawing.Size(1463, 803);
+            this.numReadsPerSec.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings6, "ReadsPerSec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numReadsPerSec.Increment = new decimal(new int[] {
             100,
             0,
@@ -798,7 +805,7 @@ namespace CerealPotter
             this.numReadsPerSec.Name = "numReadsPerSec";
             this.numReadsPerSec.Size = new System.Drawing.Size(133, 26);
             this.numReadsPerSec.TabIndex = 24;
-            this.numReadsPerSec.Value = settings3.ReadsPerSec;
+            this.numReadsPerSec.Value = settings6.ReadsPerSec;
             // 
             // label3
             // 
@@ -817,7 +824,7 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numPreThreshold.AutoSize = true;
-            this.numPreThreshold.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PreThreshold_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numPreThreshold.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings4, "PreThreshold_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numPreThreshold.Increment = new decimal(new int[] {
             1,
             0,
@@ -837,7 +844,7 @@ namespace CerealPotter
             this.numPreThreshold.Name = "numPreThreshold";
             this.numPreThreshold.Size = new System.Drawing.Size(133, 26);
             this.numPreThreshold.TabIndex = 30;
-            this.numPreThreshold.Value = settings1.PreThreshold_ms;
+            this.numPreThreshold.Value = settings4.PreThreshold_ms;
             // 
             // label9
             // 
@@ -856,7 +863,7 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numTriggerLag_ms.AutoSize = true;
-            this.numTriggerLag_ms.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PeakDetectionLag_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numTriggerLag_ms.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings4, "PeakDetectionLag_ms", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numTriggerLag_ms.Location = new System.Drawing.Point(212, 131);
             this.numTriggerLag_ms.Maximum = new decimal(new int[] {
             10000,
@@ -871,7 +878,7 @@ namespace CerealPotter
             this.numTriggerLag_ms.Name = "numTriggerLag_ms";
             this.numTriggerLag_ms.Size = new System.Drawing.Size(133, 26);
             this.numTriggerLag_ms.TabIndex = 32;
-            this.numTriggerLag_ms.Value = settings1.PeakDetectionLag_ms;
+            this.numTriggerLag_ms.Value = settings4.PeakDetectionLag_ms;
             // 
             // label10
             // 
@@ -890,7 +897,7 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numTriggerAvgWindowMs.AutoSize = true;
-            this.numTriggerAvgWindowMs.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PeakDetectionSignalInfluence", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numTriggerAvgWindowMs.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings4, "PeakDetectionSignalInfluence", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numTriggerAvgWindowMs.DecimalPlaces = 2;
             this.numTriggerAvgWindowMs.Increment = new decimal(new int[] {
             1,
@@ -906,7 +913,7 @@ namespace CerealPotter
             this.numTriggerAvgWindowMs.Name = "numTriggerAvgWindowMs";
             this.numTriggerAvgWindowMs.Size = new System.Drawing.Size(133, 26);
             this.numTriggerAvgWindowMs.TabIndex = 34;
-            this.numTriggerAvgWindowMs.Value = settings1.PeakDetectionSignalInfluence;
+            this.numTriggerAvgWindowMs.Value = settings4.PeakDetectionSignalInfluence;
             // 
             // label11
             // 
@@ -925,7 +932,7 @@ namespace CerealPotter
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.numTriggerDeltamA.AutoSize = true;
-            this.numTriggerDeltamA.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings1, "PeakDetectionThreshold", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.numTriggerDeltamA.DataBindings.Add(new System.Windows.Forms.Binding("Value", settings4, "PeakDetectionThreshold", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.numTriggerDeltamA.DecimalPlaces = 2;
             this.numTriggerDeltamA.Increment = new decimal(new int[] {
             1,
@@ -941,7 +948,7 @@ namespace CerealPotter
             this.numTriggerDeltamA.Name = "numTriggerDeltamA";
             this.numTriggerDeltamA.Size = new System.Drawing.Size(133, 26);
             this.numTriggerDeltamA.TabIndex = 36;
-            this.numTriggerDeltamA.Value = settings1.PeakDetectionThreshold;
+            this.numTriggerDeltamA.Value = settings4.PeakDetectionThreshold;
             // 
             // checkBoxLogAxis
             // 
@@ -1188,12 +1195,41 @@ namespace CerealPotter
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.InitialDirectory = settings1.DataFileInitialDirectory;
+            this.openFileDialog1.InitialDirectory = settings4.DataFileInitialDirectory;
             // 
             // rangescalesBindingSource
             // 
             this.rangescalesBindingSource.DataMember = "Rangescales";
             this.rangescalesBindingSource.DataSource = this.statusValuesBindingSource;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Dock = System.Windows.Forms.DockStyle.Left;
+            this.label12.Location = new System.Drawing.Point(0, 0);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(105, 20);
+            this.label12.TabIndex = 20;
+            this.label12.Text = "Elements/sec";
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.labelElementsPerSec);
+            this.panel2.Controls.Add(this.label12);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 180);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(290, 14);
+            this.panel2.TabIndex = 0;
+            // 
+            // labelElementsPerSec
+            // 
+            this.labelElementsPerSec.AutoSize = true;
+            this.labelElementsPerSec.Dock = System.Windows.Forms.DockStyle.Right;
+            this.labelElementsPerSec.Location = new System.Drawing.Point(290, 0);
+            this.labelElementsPerSec.Name = "labelElementsPerSec";
+            this.labelElementsPerSec.Size = new System.Drawing.Size(0, 20);
+            this.labelElementsPerSec.TabIndex = 21;
             // 
             // Form1
             // 
@@ -1251,6 +1287,8 @@ namespace CerealPotter
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.rangescalesBindingSource)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1324,6 +1362,9 @@ namespace CerealPotter
         private System.Windows.Forms.BindingSource graphValuesBindingSource;
         private System.Windows.Forms.BindingSource serialValuesBindingSource;
         private System.Windows.Forms.BindingSource rangescalesBindingSource;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label12;
+        public System.Windows.Forms.Label labelElementsPerSec;
     }
 }
 

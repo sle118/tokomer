@@ -118,7 +118,7 @@ namespace CerealPotter
             {
                 get
                 {
-                    return graphLists.Select(g => g.Count).Sum();
+                    return graphLists.Select(g => g.Input.Count).Sum()/graphLists.Count;
                 }
             }
             public AveragePoints PointsAt(string key)

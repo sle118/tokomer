@@ -12,9 +12,9 @@ static command_fifo_t queue = { 0 };
 //static actions_t *readptr = &queue[0];
 static char outBuffer[11] = { 0 };
 static const char *commands_string[] = { "NOOP", "reset", "graphvolt",
-		"graphcurr", "serial0", "serial1", "serial2", "poweron", "poweroff", "scale0",
-		"scale1", "scale2", "scale3", "digitalon", "digitaloff", "status",
-		"help",
+		"graphcurr", "serial0", "serial1", "serial2", "poweron", "poweroff",
+		"scale0", "scale1", "scale2", "scale3", "digitalon", "digitaloff",
+		"status", "help",
 		NULL };
 
 /* Create FIFO*/
@@ -234,8 +234,8 @@ void addComboVar(const char *name, int value, bool last) {
 }
 void reportStatus() {
 	uint8_t cmd_index = 0;
-	serial_state_t savestate=global.serial;
-	global.serial= SERIAL_HOLD;
+	serial_state_t savestate = global.serial;
+	global.serial = SERIAL_HOLD;
 	memset(outBuffer, 0x00, sizeof(outBuffer));
 	dataTransferHold = true;
 	strncat_flush(curly_open);
@@ -288,7 +288,7 @@ void reportStatus() {
 	strncat_flush(curly_close);
 	strncat_flush("\n");
 	strncat_flush(NULL); // flush the output buffer
-	global.serial=savestate;
+	global.serial = savestate;
 	statusRequested = false;
 	return;
 }
@@ -319,13 +319,13 @@ void handleCommandQueue() {
 		global.graphModeCurrent = true;
 		break;
 	case ACTION_SERIAL_TEXT:
-		global.serial= SERIAL_TEXT;
+		global.serial = SERIAL_TEXT;
 		break;
 	case ACTION_SERIAL_BINARY:
-		global.serial= SERIAL_BINARY;
+		global.serial = SERIAL_BINARY;
 		break;
 	case ACTION_SERIAL_OFF:
-		global.serial= SERIAL_OFF;
+		global.serial = SERIAL_OFF;
 		break;
 	case ACTION_POWER_ON:
 		calibrationStep = MAX_CALIBRATION_STEPS;
@@ -371,7 +371,7 @@ uint8_t VCP_read_line(uint8_t *Buf, uint32_t Len) {
 	if ((Buf == NULL) || (Len == 0)) {
 		return 0;
 	}
-
+	memset(Buf, 0x00, Len);
 	while (Len--) {
 		if (FIFO_DATA_END(RX_FIFO))
 			return count;
@@ -385,12 +385,7 @@ uint8_t VCP_read_line(uint8_t *Buf, uint32_t Len) {
 		*Buf++ = RX_FIFO.data[RX_FIFO.tail];
 		FIFO_INCR_TAIL(RX_FIFO);
 	}
-	if (Len > 0 && *Buf != '\0') {
-		*Buf = '\0';
-	} else if (Len == 0) {
-		*--Buf = '\0';
-		count--;
-	}
+
 	return count;
 }
 
@@ -399,25 +394,23 @@ void USBRx(void const *arg) {
 	uint8_t CommandBuffer[15] = { 0 };
 	for (;;) {
 		osEvent event = osSignalWait(SIGNAL_CR_RECEIVED | SIGNAL_DATA_RECEIVED,
-				125);
-		if (event.status == osEventSignal) {
+				osWaitForever);
+		if (event.status != osEventSignal)
+			continue;
+		if (event.value.signals & SIGNAL_CR_RECEIVED) {
 
-			if (event.value.signals & SIGNAL_CR_RECEIVED) {
-				uint8_t len = VCP_read_line(CommandBuffer,
-						sizeof(CommandBuffer));
-				if (len > 0) {
-					if (handle_command_string(CommandBuffer)
-							== COMMAND_RESULT_UNKNOWN) {
-						//show_help();
-					}
-				}
-			} else if (event.value.signals & SIGNAL_DATA_RECEIVED) {
-				if (FIFO_OVERRUN(RX_FIFO)) {
-					// flush a bit of the buffer. This should not happen
-					VCP_read_line(CommandBuffer, sizeof(CommandBuffer));
+			uint8_t len = VCP_read_line(CommandBuffer, sizeof(CommandBuffer));
+			if (len > 0) {
+				if (handle_command_string(CommandBuffer)
+						== COMMAND_RESULT_UNKNOWN) {
+					//show_help();
 				}
 			}
-
+		} else if (event.value.signals & SIGNAL_DATA_RECEIVED) {
+			if (FIFO_OVERRUN(RX_FIFO)) {
+				// flush a bit of the buffer. This should not happen
+				VCP_read_line(CommandBuffer, sizeof(CommandBuffer));
+			}
 		}
 	}
 

@@ -579,11 +579,9 @@ namespace CerealPotter
 
                         Dictionary<string, double> records = binaryParser.ParsingMatch(_buffer.ToArray());
                         if (records.Count == 0) records = parser.ParsingMatch(line);
-                        if (records.Count == 0) return;
-                        if (isPlotting)
+                        if (records.Count != 0 && isPlotting)
                         {
                             count++;
-
                             UpdataSignal(records);
                         }
 
@@ -613,6 +611,7 @@ namespace CerealPotter
             {
                 storage.Add(key, prefix, timeStamp, signals[key], tableGraphPanel.Graph(key).GraphPane);
             }
+            
         }
         private void UpdateGraph(CustomGraphControl control)
         {
@@ -639,6 +638,7 @@ namespace CerealPotter
                 }
                 control.UpdateAxis();
                 control.Invalidate();
+                SetControlText(labelElementsPerSec, string.Format($"{count / (elapsed.ElapsedMilliseconds / 1000)}"));
             }
         }
         private void Disable(Control control)
